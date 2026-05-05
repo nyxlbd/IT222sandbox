@@ -1,0 +1,342 @@
+package com.wordy.server.service;
+
+import com.wordy.proto.GameServiceGrpc;
+import com.wordy.proto.JoinGameRequest;
+import com.wordy.proto.JoinGameResponse;
+import com.wordy.proto.GameRequest;
+import com.wordy.proto.WordRequest;
+import com.wordy.proto.WordResponse;
+import com.wordy.proto.GameUpdate;
+import com.wordy.server.model.GameSession;
+import com.wordy.server.util.LetterGenerator;
+import com.wordy.server.util.WordValidator;
+import com.wordy.server.dao.UserDAO;
+import io.grpc.stub.StreamObserver;
+
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+
+/**
+ * gRPC service implementation for game operations.
+ * Handles: joining games, submitting words, streaming game updates.
+ */
+public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
+    
+    private final GameManager gameManager = GameManager.getInstance();
+    private final WordValidator wordValidator = WordValidator.getInstance();
+    private final UserDAO userDAO = new UserDAO();
+    
+    // Track client streams for sending updates: gameId -> list of StreamObservers
+    private Map<String, List<StreamObserver<GameUpdate>>> gameStreams = new ConcurrentHashMap<>();
+
+    @Override
+    public void joinGame(JoinGameRequest request, StreamObserver<JoinGameResponse> responseObserver) {
+        String username = request.getUsername();
+
+        try {
+            // Join or create a game
+            String gameId = gameManager.joinGame(username);
+            GameSession session = gameManager.getGameSession(gameId);
+
+            if (session == null) {
+                responseObserver.onNext(JoinGameResponse.newBuilder()
+                        .setSuccess(false)
+                        .setMessage("Failed to create game session")
+                        .build());
+                responseObserver.onCompleted();
+                return;
+            }
+
+            // If this is the first player, they wait
+            if (session.getPlayerCount() == 1) {
+                responseObserver.onNext(JoinGameResponse.newBuilder()
+                        .setSuccess(true)
+                        .setMessage("Game created. Waiting for another player...")
+                        .build());
+            } else if (session.getPlayerCount() == 2) {
+                // Start the game!
+                startGame(gameId);
+                responseObserver.onNext(JoinGameResponse.newBuilder()
+                        .setSuccess(true)
+                        .setMessage("Game started! " + String.join(" vs ", session.getPlayers()))
+                        .build());
+            }
+
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onNext(JoinGameResponse.newBuilder()
+                    .setSuccess(false)
+                    .setMessage("Error joining game: " + e.getMessage())
+                    .build());
+            responseObserver.onCompleted();
+        }
+    }
+
+    @Override
+    public void submitWord(WordRequest request, StreamObserver<WordResponse> responseObserver) {
+        String username = request.getUsername();
+        String word = request.getWord();
+
+        try {
+            GameSession session = gameManager.getPlayerGame(username);
+            
+            if (session == null) {
+                responseObserver.onNext(WordResponse.newBuilder()
+                        .setValid(false)
+                        .setMessage("You are not in an active game")
+                        .build());
+                responseObserver.onCompleted();
+                return;
+            }
+
+            // Validate word
+            WordValidator.ValidationResult result = wordValidator.validateWord(
+                    word, 
+                    session.getCurrentLetters()
+            );
+
+            if (result.valid) {
+                session.submitWord(username, word);
+                responseObserver.onNext(WordResponse.newBuilder()
+                        .setValid(true)
+                        .setMessage("Word submitted: " + word + " (" + word.length() + " letters)")
+                        .build());
+            } else {
+                responseObserver.onNext(WordResponse.newBuilder()
+                        .setValid(false)
+                        .setMessage(result.message)
+                        .build());
+            }
+
+            responseObserver.onCompleted();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onNext(WordResponse.newBuilder()
+                    .setValid(false)
+                    .setMessage("Error processing word: " + e.getMessage())
+                    .build());
+            responseObserver.onCompleted();
+        }
+    }
+
+    @Override
+    public void streamGame(GameRequest request, StreamObserver<GameUpdate> responseObserver) {
+        String username = request.getUsername();
+
+        try {
+            GameSession session = gameManager.getPlayerGame(username);
+            
+            if (session == null) {
+                responseObserver.onError(new Exception("Not in an active game"));
+                return;
+            }
+
+            String gameId = session.getGameId();
+            
+            // Register this stream
+            gameStreams.computeIfAbsent(gameId, k -> new ArrayList<>()).add(responseObserver);
+            System.out.println("Player " + username + " connected to game stream: " + gameId);
+
+            // Send initial WAITING update
+            broadcastGameUpdate(gameId, GameUpdate.newBuilder()
+                    .setType("WAITING")
+                    .setMessage("Waiting for another player to join...")
+                    .setRoundNumber(session.getCurrentRound())
+                    .build());
+
+            // Start game loop for this session if it hasn't started yet
+            if (session.getPlayerCount() == 2 && session.getCurrentRound() == 1) {
+                new Thread(() -> runGameLoop(gameId)).start();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onError(e);
+        }
+    }
+
+    // ==================== Private Helper Methods ====================
+
+    /**
+     * Starts a game: generates letters and broadcasts START update.
+     */
+    private void startGame(String gameId) {
+        GameSession session = gameManager.getGameSession(gameId);
+        if (session != null) {
+            String letters = LetterGenerator.generateLetters();
+            session.setCurrentLetters(letters);
+            
+            broadcastGameUpdate(gameId, GameUpdate.newBuilder()
+                    .setType("START")
+                    .setMessage("Game is starting! You have 30 seconds per round.")
+                    .setLetters(letters)
+                    .setRoundNumber(session.getCurrentRound())
+                    .build());
+        }
+    }
+
+    /**
+     * Main game loop: handles rounds, determines winners, ends game.
+     */
+    private void runGameLoop(String gameId) {
+        GameSession session = gameManager.getGameSession(gameId);
+        if (session == null) return;
+
+        try {
+            while (!session.isGameOver()) {
+                // Send round start with letters
+                String letters = LetterGenerator.generateLetters();
+                session.setCurrentLetters(letters);
+                
+                broadcastGameUpdate(gameId, GameUpdate.newBuilder()
+                        .setType("ROUND")
+                        .setMessage("Round " + session.getCurrentRound() + " started!")
+                        .setLetters(letters)
+                        .setRoundNumber(session.getCurrentRound())
+                        .build());
+
+                // Wait for round duration
+                Thread.sleep(GameSession.getRoundDuration());
+
+                // Determine round winner
+                String roundWinner = determineRoundWinner(session);
+                session.setRoundWinner(roundWinner);
+
+                // Send result
+                String resultMessage;
+                if (roundWinner != null) {
+                    resultMessage = roundWinner + " won this round with their word!";
+                } else {
+                    resultMessage = "No winner this round. No valid words or tie.";
+                }
+
+                broadcastGameUpdate(gameId, GameUpdate.newBuilder()
+                        .setType("RESULT")
+                        .setMessage(resultMessage)
+                        .setWinner(roundWinner != null ? roundWinner : "")
+                        .setRoundNumber(session.getCurrentRound())
+                        .build());
+
+                // Pause between rounds
+                Thread.sleep(2000);
+
+                // Check if game is over
+                if (session.isGameOver()) {
+                    String gameWinner = session.getWinner();
+                    Map<String, Integer> wins = session.getRoundWins();
+                    
+                    broadcastGameUpdate(gameId, GameUpdate.newBuilder()
+                            .setType("GAME_OVER")
+                            .setMessage(gameWinner + " wins the game with 3 round victories! Final: " + wins)
+                            .setWinner(gameWinner)
+                            .setRoundNumber(session.getCurrentRound())
+                            .build());
+                    
+                    session.endGame();
+                    
+                    // Record game result to database
+                    recordGameResult(gameId, session);
+                } else {
+                    // Start next round
+                    session.startNewRound();
+                }
+            }
+
+            // Close all streams for this game
+            closeGameStreams(gameId);
+            
+            // Remove game session after a delay
+            Thread.sleep(5000);
+            gameManager.removeGameSession(gameId);
+
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            System.err.println("Game loop interrupted: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Determines the round winner (player with longest valid word).
+     */
+    private String determineRoundWinner(GameSession session) {
+        Map<String, List<String>> submissions = session.getRoundSubmissions();
+        String winner = null;
+        int longestLength = 0;
+
+        for (String player : submissions.keySet()) {
+            List<String> words = submissions.get(player);
+            for (String word : words) {
+                if (word.length() > longestLength) {
+                    longestLength = word.length();
+                    winner = player;
+                }
+            }
+        }
+
+        return winner;
+    }
+
+    /**
+     * Broadcasts a game update to all players in a game.
+     */
+    private void broadcastGameUpdate(String gameId, GameUpdate update) {
+        List<StreamObserver<GameUpdate>> streams = gameStreams.getOrDefault(gameId, new ArrayList<>());
+        List<StreamObserver<GameUpdate>> deadStreams = new ArrayList<>();
+
+        for (StreamObserver<GameUpdate> stream : streams) {
+            try {
+                stream.onNext(update);
+            } catch (Exception e) {
+                System.err.println("Error sending update to client: " + e.getMessage());
+                deadStreams.add(stream);
+            }
+        }
+
+        // Remove dead streams
+        streams.removeAll(deadStreams);
+    }
+
+    /**
+     * Closes all streams for a game.
+     */
+    private void closeGameStreams(String gameId) {
+        List<StreamObserver<GameUpdate>> streams = gameStreams.get(gameId);
+        if (streams != null) {
+            for (StreamObserver<GameUpdate> stream : streams) {
+                try {
+                    stream.onCompleted();
+                } catch (Exception e) {
+                    System.err.println("Error closing stream: " + e.getMessage());
+                }
+            }
+            gameStreams.remove(gameId);
+        }
+    }
+
+    /**
+     * Records the game result to the database.
+     * Updates the winner's win count.
+     */
+    private void recordGameResult(String gameId, GameSession session) {
+        try {
+            String winner = session.getWinner();
+            if (winner != null && !winner.isEmpty()) {
+                // Increment the winner's win count in the database
+                boolean updated = userDAO.incrementWins(winner);
+                System.out.println("Game " + gameId + " finished. Winner: " + winner);
+                if (updated) {
+                    System.out.println("Successfully recorded win for: " + winner);
+                } else {
+                    System.err.println("Failed to record win for: " + winner);
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("Error recording game result: " + e.getMessage());
+        }
+    }
+}
