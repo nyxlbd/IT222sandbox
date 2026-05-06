@@ -11,6 +11,8 @@ import com.wordy.server.model.GameSession;
 import com.wordy.server.util.LetterGenerator;
 import com.wordy.server.util.WordValidator;
 import com.wordy.server.dao.UserDAO;
+import com.wordy.server.dao.WordDAO;
+import com.wordy.server.dao.GameResultDAO;
 import io.grpc.stub.StreamObserver;
 
 import java.util.*;
@@ -25,6 +27,8 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
     private final GameManager gameManager = GameManager.getInstance();
     private final WordValidator wordValidator = WordValidator.getInstance();
     private final UserDAO userDAO = new UserDAO();
+    private final WordDAO wordDAO = new WordDAO();
+    private final GameResultDAO gameResultDAO = new GameResultDAO();
     
     // Track client streams for sending updates: gameId -> list of StreamObservers
     private Map<String, List<StreamObserver<GameUpdate>>> gameStreams = new ConcurrentHashMap<>();
@@ -99,6 +103,15 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
 
             if (result.valid) {
                 session.submitWord(username, word);
+                
+                // Save the word to the database
+                boolean saved = wordDAO.saveWord(username, word);
+                if (saved) {
+                    System.out.println("Word saved to database: " + username + " - " + word);
+                } else {
+                    System.err.println("Failed to save word to database: " + username + " - " + word);
+                }
+                
                 responseObserver.onNext(WordResponse.newBuilder()
                         .setValid(true)
                         .setMessage("Word submitted: " + word + " (" + word.length() + " letters)")
@@ -213,7 +226,7 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
                         .build());
 
                 // Wait for round duration
-                Thread.sleep(GameSession.getRoundDuration());
+                Thread.sleep(session.getRoundDuration());
 
                 // Determine round winner
                 String roundWinner = determineRoundWinner(session);
@@ -244,7 +257,7 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
                     
                     broadcastGameUpdate(gameId, GameUpdate.newBuilder()
                             .setType("GAME_OVER")
-                            .setMessage(gameWinner + " wins the game with 3 round victories! Final: " + wins)
+                            .setMessage(gameWinner + " wins the game with " + GameSession.getWinsToWinGame() + " round victories! Final: " + wins)
                             .setWinner(gameWinner)
                             .setRoundNumber(session.getCurrentRound())
                             .build());
@@ -372,12 +385,24 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
             String winner = session.getWinner();
             if (winner != null && !winner.isEmpty()) {
                 // Increment the winner's win count in the database
-                boolean updated = userDAO.incrementWins(winner);
-                System.out.println("Game " + gameId + " finished. Winner: " + winner);
-                if (updated) {
+                boolean winsUpdated = userDAO.incrementWins(winner);
+                
+                // Record the full game result
+                int totalRounds = session.getCurrentRound();
+                boolean resultRecorded = gameResultDAO.recordGameResult(winner, totalRounds);
+                
+                System.out.println("Game " + gameId + " finished. Winner: " + winner + " after " + totalRounds + " rounds");
+                
+                if (winsUpdated) {
                     System.out.println("Successfully recorded win for: " + winner);
                 } else {
                     System.err.println("Failed to record win for: " + winner);
+                }
+                
+                if (resultRecorded) {
+                    System.out.println("Successfully recorded game result for: " + winner);
+                } else {
+                    System.err.println("Failed to record game result for: " + winner);
                 }
             }
         } catch (Exception e) {

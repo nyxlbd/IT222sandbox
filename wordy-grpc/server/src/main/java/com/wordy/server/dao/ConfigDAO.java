@@ -124,4 +124,100 @@ public class ConfigDAO {
 
         return false;
     }
+
+    /**
+     * Gets the wait time duration in milliseconds.
+     *
+     * @param defaultValue the default value in seconds if not found
+     * @return the wait time in milliseconds
+     */
+    public int getWaitTime(int defaultValue) {
+        String sql = "SELECT wait_time FROM config WHERE id = 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int waitTimeSeconds = rs.getInt("wait_time");
+                return waitTimeSeconds * 1000; // Convert to milliseconds
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return defaultValue * 1000; // Return default in milliseconds
+    }
+
+    /**
+     * Gets the round duration in milliseconds.
+     *
+     * @param defaultValue the default value in seconds if not found
+     * @return the round duration in milliseconds
+     */
+    public int getRoundDuration(int defaultValue) {
+        String sql = "SELECT round_duration FROM config WHERE id = 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                int roundDurationSeconds = rs.getInt("round_duration");
+                return roundDurationSeconds * 1000; // Convert to milliseconds
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return defaultValue * 1000; // Return default in milliseconds
+    }
+
+    /**
+     * Updates the wait time configuration.
+     *
+     * @param waitTimeSeconds the new wait time in seconds
+     * @return true if updated successfully
+     */
+    public boolean updateWaitTime(int waitTimeSeconds) {
+        String sql = "UPDATE config SET wait_time = ? WHERE id = 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, waitTimeSeconds);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    /**
+     * Updates the round duration configuration.
+     *
+     * @param roundDurationSeconds the new round duration in seconds
+     * @return true if updated successfully
+     */
+    public boolean updateRoundDuration(int roundDurationSeconds) {
+        String sql = "UPDATE config SET round_duration = ? WHERE id = 1";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, roundDurationSeconds);
+            return stmt.executeUpdate() > 0;
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 }

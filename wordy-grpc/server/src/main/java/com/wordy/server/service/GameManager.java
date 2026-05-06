@@ -1,6 +1,7 @@
 package com.wordy.server.service;
 
 import com.wordy.server.model.GameSession;
+import com.wordy.server.dao.ConfigDAO;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -15,13 +16,18 @@ public class GameManager {
     private Map<String, String> playerToGame; // username -> gameId
     private Queue<String> waitingPlayers; // Players waiting to join a game
     private long waitStartTime;
-    private static final int WAIT_DURATION = 10000; // 10 seconds
+    private int waitDuration; // Milliseconds - loaded from database
+    private static final int DEFAULT_WAIT_DURATION = 10; // Default in seconds
     private static final int MIN_PLAYERS_TO_START = 2;
 
     private GameManager() {
         this.activeSessions = new ConcurrentHashMap<>();
         this.playerToGame = new ConcurrentHashMap<>();
         this.waitingPlayers = new LinkedList<>();
+        
+        // Load configuration from database
+        ConfigDAO configDAO = new ConfigDAO();
+        this.waitDuration = configDAO.getWaitTime(DEFAULT_WAIT_DURATION);
     }
 
     /**
@@ -142,7 +148,7 @@ public class GameManager {
      * @return true if wait time exceeded
      */
     private boolean isWaitTimeExceeded() {
-        return (System.currentTimeMillis() - waitStartTime) > WAIT_DURATION;
+        return (System.currentTimeMillis() - waitStartTime) > waitDuration;
     }
 
     /**
@@ -152,7 +158,7 @@ public class GameManager {
      */
     public long getWaitTimeRemaining() {
         long elapsed = System.currentTimeMillis() - waitStartTime;
-        return Math.max(0, WAIT_DURATION - elapsed);
+        return Math.max(0, waitDuration - elapsed);
     }
 
     /**

@@ -2,6 +2,7 @@ package com.wordy.server.model;
 
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import com.wordy.server.dao.ConfigDAO;
 
 /**
  * Represents an active game session.
@@ -18,8 +19,11 @@ public class GameSession {
     private long roundStartTime;
     private boolean gameActive;
     private boolean gameStarted; // True once startGame() has been called
-    private static final int ROUND_DURATION = 30000; // 30 seconds in milliseconds
-    private static final int WAIT_DURATION = 10000; // 10 seconds wait for players
+    private int roundDuration; // Milliseconds - loaded from database
+    private int waitDuration; // Milliseconds - loaded from database
+    private static final int WINS_TO_WIN_GAME = 3; // Number of round wins needed to win the game
+    private static final int DEFAULT_ROUND_DURATION = 30; // Default in seconds
+    private static final int DEFAULT_WAIT_DURATION = 10; // Default in seconds
 
     public GameSession(String gameId, String firstPlayer) {
         this.gameId = gameId;
@@ -31,6 +35,11 @@ public class GameSession {
         this.gameActive = true;
         this.gameStarted = false;
         this.roundWins.put(firstPlayer, 0);
+        
+        // Load configuration from database
+        ConfigDAO configDAO = new ConfigDAO();
+        this.roundDuration = configDAO.getRoundDuration(DEFAULT_ROUND_DURATION);
+        this.waitDuration = configDAO.getWaitTime(DEFAULT_WAIT_DURATION);
     }
 
     // ==================== Player Management ====================
@@ -132,9 +141,9 @@ public class GameSession {
     }
 
     public String getWinner() {
-        // Find player with 3 round wins
+        // Find player with 3 round wins (first to reach WINS_TO_WIN_GAME)
         for (String player : players) {
-            if (roundWins.getOrDefault(player, 0) >= 3) {
+            if (roundWins.getOrDefault(player, 0) >= WINS_TO_WIN_GAME) {
                 return player;
             }
         }
@@ -153,19 +162,23 @@ public class GameSession {
 
     public long getRoundTimeRemaining() {
         long elapsed = getRoundElapsedTime();
-        return Math.max(0, ROUND_DURATION - elapsed);
+        return Math.max(0, roundDuration - elapsed);
     }
 
     public boolean isRoundTimeUp() {
-        return getRoundElapsedTime() >= ROUND_DURATION;
+        return getRoundElapsedTime() >= roundDuration;
     }
 
-    public static int getRoundDuration() {
-        return ROUND_DURATION;
+    public int getRoundDuration() {
+        return roundDuration;
     }
 
-    public static int getWaitDuration() {
-        return WAIT_DURATION;
+    public int getWaitDuration() {
+        return waitDuration;
+    }
+
+    public static int getWinsToWinGame() {
+        return WINS_TO_WIN_GAME;
     }
 
     // ==================== Getters ====================

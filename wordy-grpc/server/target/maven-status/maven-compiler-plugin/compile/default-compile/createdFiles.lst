@@ -10,6 +10,7 @@ com\wordy\server\service\AdminServiceImpl.class
 com\wordy\server\TestDB.class
 com\wordy\server\util\LetterGenerator.class
 com\wordy\server\util\WordValidator$ValidationResult.class
+com\wordy\server\dao\GameResultDAO.class
 com\wordy\server\service\LeaderboardServiceImpl.class
 com\wordy\server\model\GameSession.class
 com\wordy\server\service\GameServiceImpl.class
