@@ -17,6 +17,7 @@ public class GameSession {
     private String roundWinner;
     private long roundStartTime;
     private boolean gameActive;
+    private boolean gameStarted; // True once startGame() has been called
     private static final int ROUND_DURATION = 30000; // 30 seconds in milliseconds
     private static final int WAIT_DURATION = 10000; // 10 seconds wait for players
 
@@ -28,6 +29,7 @@ public class GameSession {
         this.roundWins = new ConcurrentHashMap<>();
         this.roundSubmissions = new ConcurrentHashMap<>();
         this.gameActive = true;
+        this.gameStarted = false;
         this.roundWins.put(firstPlayer, 0);
     }
 
@@ -74,7 +76,8 @@ public class GameSession {
 
     public void setRoundWinner(String username) {
         this.roundWinner = username;
-        if (roundWins.containsKey(username)) {
+        // Only update roundWins if username is not null
+        if (username != null && roundWins.containsKey(username)) {
             roundWins.put(username, roundWins.get(username) + 1);
         }
     }
@@ -107,6 +110,14 @@ public class GameSession {
 
     public void endGame() {
         this.gameActive = false;
+    }
+
+    public boolean hasGameStarted() {
+        return gameStarted;
+    }
+
+    public void markGameStarted() {
+        this.gameStarted = true;
     }
 
     public String getWinner() {

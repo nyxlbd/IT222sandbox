@@ -140,12 +140,22 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
             gameStreams.computeIfAbsent(gameId, k -> new ArrayList<>()).add(responseObserver);
             System.out.println("Player " + username + " connected to game stream: " + gameId);
 
-            // Send initial WAITING update
-            broadcastGameUpdate(gameId, GameUpdate.newBuilder()
-                    .setType("WAITING")
-                    .setMessage("Waiting for another player to join...")
-                    .setRoundNumber(session.getCurrentRound())
-                    .build());
+            // If game has already started, send the START update to this player
+            if (session.hasGameStarted()) {
+                responseObserver.onNext(GameUpdate.newBuilder()
+                        .setType("START")
+                        .setMessage("Game is starting! You have 30 seconds per round.")
+                        .setLetters(session.getCurrentLetters())
+                        .setRoundNumber(session.getCurrentRound())
+                        .build());
+            } else {
+                // Send initial WAITING update
+                responseObserver.onNext(GameUpdate.newBuilder()
+                        .setType("WAITING")
+                        .setMessage("Waiting for another player to join...")
+                        .setRoundNumber(session.getCurrentRound())
+                        .build());
+            }
 
             // Note: Game loop is started by startGame() when the second player joins via joinGame()
 
@@ -165,6 +175,7 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
         if (session != null) {
             String letters = LetterGenerator.generateLetters();
             session.setCurrentLetters(letters);
+            session.markGameStarted(); // Mark that game has started
             
             broadcastGameUpdate(gameId, GameUpdate.newBuilder()
                     .setType("START")
