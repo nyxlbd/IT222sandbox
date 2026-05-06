@@ -18,6 +18,13 @@ public class WordyDashboard extends JFrame {
 
     public WordyDashboard(String username) {
         this.currentUsername = username;
+        
+        // Update the GameStateManager singleton with the logged-in user
+        if (username != null) {
+            GameStateManager manager = GameStateManager.getInstance();
+            manager.setCurrentUser(username, "PLAYER");
+        }
+        
         setTitle("Wordy - Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setSize(1000, 700);

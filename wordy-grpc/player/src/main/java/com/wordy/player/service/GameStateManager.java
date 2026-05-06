@@ -92,6 +92,19 @@ public class GameStateManager {
         }
     }
 
+    /**
+     * Sets the current logged-in user directly (used after UI login has already succeeded).
+     * This avoids making a second login call when the UI has already authenticated the user.
+     *
+     * @param username the username of the logged-in player
+     * @param userRole the role of the user (PLAYER, ADMIN, etc.)
+     */
+    public void setCurrentUser(String username, String userRole) {
+        this.currentUsername = username;
+        this.currentUserRole = userRole;
+        System.out.println("Current user set to: " + username + " (Role: " + userRole + ")");
+    }
+
     // ==================== Game Methods ====================
 
     /**
