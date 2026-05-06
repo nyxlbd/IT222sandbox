@@ -147,10 +147,7 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
                     .setRoundNumber(session.getCurrentRound())
                     .build());
 
-            // Start game loop for this session if it hasn't started yet
-            if (session.getPlayerCount() == 2 && session.getCurrentRound() == 1) {
-                new Thread(() -> runGameLoop(gameId)).start();
-            }
+            // Note: Game loop is started by startGame() when the second player joins via joinGame()
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -161,7 +158,7 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
     // ==================== Private Helper Methods ====================
 
     /**
-     * Starts a game: generates letters and broadcasts START update.
+     * Starts a game: generates letters and broadcasts START update, and initiates the game loop.
      */
     private void startGame(String gameId) {
         GameSession session = gameManager.getGameSession(gameId);
@@ -175,6 +172,9 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
                     .setLetters(letters)
                     .setRoundNumber(session.getCurrentRound())
                     .build());
+            
+            // Start the game loop in a new thread
+            new Thread(() -> runGameLoop(gameId)).start();
         }
     }
 
