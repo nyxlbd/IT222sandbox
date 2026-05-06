@@ -315,7 +315,12 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
         SwingUtilities.invokeLater(() -> {
             switch (update.getType().toUpperCase()) {
                 case "ROUND":
-                    // New round started - display letters
+                    // New round started - display letters and update round number
+                    if (update.getRoundNumber() > 0) {
+                        currentRound = update.getRoundNumber();
+                        roundTitle.setText("Round " + currentRound);
+                        roundLabel.setText("Round " + currentRound + " (You: " + playerWins + " | Opponent: " + opponentWins + ")");
+                    }
                     if (update.getLetters() != null && !update.getLetters().isEmpty()) {
                         displayLetters(update.getLetters());
                         timeRemaining = 30;

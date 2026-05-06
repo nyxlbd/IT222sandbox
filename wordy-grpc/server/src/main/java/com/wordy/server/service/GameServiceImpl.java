@@ -197,6 +197,9 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
         if (session == null) return;
 
         try {
+            // Initialize roundSubmissions for the first round
+            session.initializeRound();
+            
             while (!session.isGameOver()) {
                 // Send round start with letters
                 String letters = LetterGenerator.generateLetters();
@@ -273,22 +276,53 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
 
     /**
      * Determines the round winner (player with longest valid word).
+     * Returns null if there's a tie (multiple players with same longest length)
+     * or if no valid words are submitted.
      */
     private String determineRoundWinner(GameSession session) {
         Map<String, List<String>> submissions = session.getRoundSubmissions();
+        
+        if (submissions == null || submissions.isEmpty()) {
+            return null; // No submissions = no winner
+        }
+        
         String winner = null;
         int longestLength = 0;
+        int playersWithLongestLength = 0;
 
+        // First pass: find the longest word length
         for (String player : submissions.keySet()) {
             List<String> words = submissions.get(player);
             for (String word : words) {
                 if (word.length() > longestLength) {
                     longestLength = word.length();
-                    winner = player;
                 }
             }
         }
 
+        // If no valid words submitted (longestLength is still 0)
+        if (longestLength == 0) {
+            return null;
+        }
+
+        // Second pass: count how many players have words of the longest length
+        for (String player : submissions.keySet()) {
+            List<String> words = submissions.get(player);
+            for (String word : words) {
+                if (word.length() == longestLength) {
+                    playersWithLongestLength++;
+                    winner = player; // Keep track of the player
+                    break; // Only count once per player
+                }
+            }
+        }
+
+        // If multiple players have the same longest length, it's a tie - no winner
+        if (playersWithLongestLength > 1) {
+            return null;
+        }
+
+        // Return the single winner, or null if no one submitted valid words
         return winner;
     }
 

@@ -52,6 +52,17 @@ public class GameSession {
 
     // ==================== Round Management ====================
 
+    public void initializeRound() {
+        // Initialize submission list for each player (for the first round)
+        roundSubmissions.clear();
+        roundWinner = null;
+        roundStartTime = System.currentTimeMillis();
+        
+        for (String player : players) {
+            roundSubmissions.put(player, new ArrayList<>());
+        }
+    }
+
     public void startNewRound() {
         currentRound++;
         roundSubmissions.clear();
