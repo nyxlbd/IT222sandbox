@@ -202,8 +202,7 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
         submissionsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, 10, 10));
         gamePanel.add(submissionsPanel);
 
-        // Start Timer
-        startTimer();
+        // Don't start timer here - wait for first ROUND update from server
     }
 
     private void displayLetters(String letters) {
