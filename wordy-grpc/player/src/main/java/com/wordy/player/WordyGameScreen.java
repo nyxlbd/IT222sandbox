@@ -27,6 +27,8 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
     private GameStateManager gameManager;
     private int playerWins = 0;
     private int opponentWins = 0;
+    private List<Integer> playerRoundScores = new ArrayList<>();
+    private List<Integer> opponentRoundScores = new ArrayList<>();
 
     public WordyGameScreen(int round) {
         this.currentRound = round;
@@ -338,15 +340,21 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
                         String resultMessage;
                         if (update.getWinner().equals(gameManager.getCurrentUsername())) {
                             playerWins++;
+                            playerRoundScores.add(1);
+                            opponentRoundScores.add(0);
                             resultMessage = "You won this round!";
                         } else {
                             opponentWins++;
+                            playerRoundScores.add(0);
+                            opponentRoundScores.add(1);
                             resultMessage = update.getWinner() + " won this round!";
                         }
                         resultMessage += "\n" + update.getMessage();
                         JOptionPane.showMessageDialog(this, resultMessage, "Round Result", JOptionPane.INFORMATION_MESSAGE);
                         roundLabel.setText("Round " + currentRound + " (You: " + playerWins + " | Opponent: " + opponentWins + ")");
                     } else {
+                        playerRoundScores.add(0);
+                        opponentRoundScores.add(0);
                         JOptionPane.showMessageDialog(this, "No winner this round. " + update.getMessage(), 
                             "Round Result", JOptionPane.INFORMATION_MESSAGE);
                     }
@@ -359,7 +367,7 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
                     String finalResult = playerWins > opponentWins ? "You won the game!" : "You lost the game!";
                     JOptionPane.showMessageDialog(this, finalResult + "\n" + update.getMessage(), 
                         "Game Over", JOptionPane.INFORMATION_MESSAGE);
-                    new WordyGameResults(playerWins, opponentWins).setVisible(true);
+                    new WordyGameResults(playerWins, opponentWins, playerRoundScores, opponentRoundScores).setVisible(true);
                     dispose();
                     break;
             }

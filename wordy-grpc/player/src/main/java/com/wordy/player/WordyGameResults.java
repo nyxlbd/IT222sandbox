@@ -3,20 +3,23 @@ package com.wordy.player;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.util.List;
 
 public class WordyGameResults extends JFrame {
-    public WordyGameResults(int yourScore, int opponentScore) {
+    public WordyGameResults(int yourScore, int opponentScore, List<Integer> playerRoundScores, List<Integer> opponentRoundScores) {
         setTitle("Game Results");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(400, 250);
+        
+        // Dynamically size based on number of rounds
+        int numRounds = playerRoundScores.size();
+        int windowHeight = Math.max(250, 120 + (numRounds * 20) + 60);
+        int tableHeight = Math.min(200, numRounds * 20 + 30);
+        
+        setSize(400, windowHeight);
         setLocationRelativeTo(null);
         setResizable(false);
         getContentPane().setBackground(new Color(30, 30, 30));
         setLayout(null);
-
-        // ===== SAMPLE ROUND SCORES =====
-        int[] yourRoundScores = {1, 0, 1};
-        int[] opponentRoundScores = {0, 1, 0};
 
         // Result
         String result = yourScore > opponentScore ? "YOU WIN!" : yourScore < opponentScore ? "YOU LOST" : "TIE";
@@ -35,27 +38,27 @@ public class WordyGameResults extends JFrame {
         scoreLabel.setHorizontalAlignment(SwingConstants.CENTER);
         add(scoreLabel);
 
-        // ===== ROUND SCORE TABLE (ADDED) =====
+        // ===== ROUND SCORE TABLE (DISPLAYS ALL ROUNDS) =====
         String[] columns = {"Round", "You", "Opponent"};
         DefaultTableModel model = new DefaultTableModel(columns, 0);
 
-        for (int i = 0; i < 3; i++) {
+        for (int i = 0; i < numRounds; i++) {
             model.addRow(new Object[]{
                     "Round " + (i + 1),
-                    yourRoundScores[i],
-                    opponentRoundScores[i]
+                    playerRoundScores.get(i),
+                    opponentRoundScores.get(i)
             });
         }
 
         JTable table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(50, 120, 300, 80);
+        scrollPane.setBounds(50, 120, 300, tableHeight);
         add(scrollPane);
 
         // Dashboard Button
         JButton dashboardBtn = new JButton("Dashboard");
         dashboardBtn.setFont(new Font("Arial", Font.PLAIN, 18));
-        dashboardBtn.setBounds(40, 210, 150, 40); // moved slightly down
+        dashboardBtn.setBounds(40, windowHeight - 50, 150, 40);
         dashboardBtn.setBackground(new Color(50,50,50));
         dashboardBtn.setForeground(Color.WHITE);
         dashboardBtn.setBorderPainted(false);
@@ -69,7 +72,7 @@ public class WordyGameResults extends JFrame {
         // Play Again Button
         JButton playAgainBtn = new JButton("Play Again");
         playAgainBtn.setFont(new Font("Arial", Font.PLAIN, 18));
-        playAgainBtn.setBounds(200, 210, 150, 40); // moved slightly down
+        playAgainBtn.setBounds(200, windowHeight - 50, 150, 40);
         playAgainBtn.setBackground(new Color(50, 50, 50));
         playAgainBtn.setForeground(Color.WHITE);
         playAgainBtn.setBorderPainted(false);
@@ -82,6 +85,8 @@ public class WordyGameResults extends JFrame {
     }
 
     public static void main(String[] args) {
-        new WordyGameResults(2, 1).setVisible(true); // example total scores
+        java.util.List<Integer> playerScores = java.util.Arrays.asList(1, 0, 1);
+        java.util.List<Integer> opponentScores = java.util.Arrays.asList(0, 1, 0);
+        new WordyGameResults(2, 1, playerScores, opponentScores).setVisible(true); // example with all rounds
     }
 }
