@@ -10,6 +10,33 @@ import com.wordy.player.service.GameStateManager;
 
 public class WordyDashboard extends JFrame {
 
+    public static final String GAME_RULES =
+                    "GETTING STARTED:\n" +
+                    "At least 2 players must join within 10 seconds to start a game\n" +
+                    "First player to win 3 rounds wins the game\n\n" +
+
+                    "EACH ROUND:\n" +
+                    "Server generates and sends 20 random letters to all players\n" +
+                    "Letters will contain 5-7 vowels (letters may repeat)\n" +
+                    "You have 30 seconds per round to submit your word\n\n" +
+
+                    "SUBMITTING WORDS:\n" +
+                    "Words must be at least 5 letters long\n" +
+                    "Words must be valid English words\n" +
+                    "Words can only use letters from the given list\n" +
+                    "You can submit multiple words within the time limit\n" +
+                    "Invalid words will be rejected by the server\n\n" +
+
+                    "WINNING A ROUND:\n" +
+                    "The player with the longest valid word wins the round\n" +
+                    "If multiple players have the same longest word length,\n" +
+                    "no winner is declared for that round\n" +
+                    "If no valid words are submitted, no winner is declared\n\n" +
+
+                    "GAME COMPLETION:\n" +
+                    "First player to win 3 rounds is the overall winner\n" +
+                    "Game statistics are recorded on the leaderboard";
+
     private String currentUsername;
 
     public WordyDashboard() {
@@ -27,7 +54,7 @@ public class WordyDashboard extends JFrame {
         
         setTitle("Wordy - Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 700);
+        setSize(1200, 900);
         getContentPane().setBackground(new Color(30, 30, 30));
         setLayout(null);
         setLocationRelativeTo(null);
@@ -35,14 +62,14 @@ public class WordyDashboard extends JFrame {
         // Main Container Panel
         JPanel mainContainer = new JPanel();
         mainContainer.setBackground(new Color(80, 80, 80));
-        mainContainer.setBounds(20, 20, 940, 620);
+        mainContainer.setBounds(20, 20, 1140, 820);
         mainContainer.setLayout(null);
         add(mainContainer);
 
         // Header Panel
         JPanel headerPanel = new JPanel();
         headerPanel.setBackground(new Color(80, 80, 80));
-        headerPanel.setBounds(0, 0, 940, 100);
+        headerPanel.setBounds(0, 0, 1140, 100);
         headerPanel.setLayout(null);
         mainContainer.add(headerPanel);
 
@@ -56,7 +83,7 @@ public class WordyDashboard extends JFrame {
         // Logout Button
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("Arial", Font.PLAIN, 12));
-        logoutBtn.setBounds(820, 35, 80, 25);
+        logoutBtn.setBounds(1020, 35, 80, 25);
         logoutBtn.setBackground(new Color(200, 200, 200));
         logoutBtn.setForeground(Color.BLACK);
         logoutBtn.setFocusPainted(false);
@@ -98,13 +125,13 @@ public class WordyDashboard extends JFrame {
         // Divider Line
         JPanel divider = new JPanel();
         divider.setBackground(Color.WHITE);
-        divider.setBounds(0, 100, 1000, 2);
+        divider.setBounds(0, 100, 1200, 2);
         mainContainer.add(divider);
 
         // Content Area Panel
         JPanel contentArea = new JPanel();
         contentArea.setBackground(new Color(80, 80, 80));
-        contentArea.setBounds(0, 102, 940, 548);
+        contentArea.setBounds(0, 102, 940, 718);
         contentArea.setLayout(null);
         mainContainer.add(contentArea);
 
@@ -112,13 +139,13 @@ public class WordyDashboard extends JFrame {
         JLabel welcomeLabel = new JLabel("Welcome Player!");
         welcomeLabel.setFont(new Font("Arial", Font.PLAIN, 36));
         welcomeLabel.setForeground(Color.WHITE);
-        welcomeLabel.setBounds(350, 20, 300, 50);
+        welcomeLabel.setBounds(450, 20, 300, 50);
         contentArea.add(welcomeLabel);
 
         // Start Game Button
         JPanel startGamePanel = new JPanel();
         startGamePanel.setBackground(new Color(200, 200, 200));
-        startGamePanel.setBounds(100, 90, 750, 100);
+        startGamePanel.setBounds(250, 90, 750, 100);
         startGamePanel.setLayout(null);
         startGamePanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         startGamePanel.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -162,7 +189,7 @@ public class WordyDashboard extends JFrame {
         // LeaderBoard Button
         JPanel leaderboardPanel = new JPanel();
         leaderboardPanel.setBackground(new Color(200, 200, 200));
-        leaderboardPanel.setBounds(100, 210, 750, 100);
+        leaderboardPanel.setBounds(250, 210, 750, 100);
         leaderboardPanel.setLayout(null);
         leaderboardPanel.setCursor(new Cursor(Cursor.HAND_CURSOR));
         leaderboardPanel.addMouseListener(new java.awt.event.MouseAdapter() { // Temporary Function LeaderBoard Button
@@ -188,23 +215,35 @@ public class WordyDashboard extends JFrame {
         // Rules Panel
         JPanel rulesPanel = new JPanel();
         rulesPanel.setBackground(new Color(200, 200, 200));
-        rulesPanel.setBounds(100, 330, 750, 140);
-        rulesPanel.setLayout(null);
+        rulesPanel.setBounds(250, 330, 750, 350);
+        rulesPanel.setLayout(new BorderLayout());
+        rulesPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
         contentArea.add(rulesPanel);
 
         JLabel rulesTitle = new JLabel("Rules of the Game");
         rulesTitle.setFont(new Font("Arial", Font.BOLD, 20));
         rulesTitle.setForeground(new Color(80, 80, 80));
-        rulesTitle.setBounds(20, 10, 300, 30);
-        rulesPanel.add(rulesTitle);
+        rulesPanel.add(rulesTitle, BorderLayout.NORTH);
 
-        JLabel rulesDesc = new JLabel("achuchuchuchuhcuhcuchu"); // Description of the Rules of the game
-        rulesDesc.setFont(new Font("Arial", Font.PLAIN, 14));
+
+        JTextArea rulesDesc = new JTextArea(GAME_RULES);
+        rulesDesc.setFont(new Font("Arial", Font.PLAIN, 12));
         rulesDesc.setForeground(new Color(100, 100, 100));
-        rulesDesc.setBounds(20, 50, 500, 70);
-        rulesDesc.setVerticalAlignment(SwingConstants.TOP);
-        rulesPanel.add(rulesDesc);
+        rulesDesc.setBackground(new Color(200, 200, 200));
+        rulesDesc.setLineWrap(true);
+        rulesDesc.setWrapStyleWord(true);
+        rulesDesc.setEditable(false);
+        rulesDesc.setMargin(new Insets(5, 5, 5, 5));
+        rulesDesc.setCaretPosition(0);
+
+
+        JScrollPane scrollPane = new JScrollPane(rulesDesc);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        scrollPane.getViewport().setBackground(new Color(200, 200, 200));
+        rulesPanel.add(scrollPane, BorderLayout.CENTER);
     }
+
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> new WordyDashboard().setVisible(true));
