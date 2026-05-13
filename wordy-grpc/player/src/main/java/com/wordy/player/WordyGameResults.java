@@ -12,8 +12,8 @@ public class WordyGameResults extends JFrame {
         
         // Dynamically size based on number of rounds
         int numRounds = playerRoundScores.size();
-        int windowHeight = Math.max(250, 120 + (numRounds * 20) + 60);
-        int tableHeight = Math.min(200, numRounds * 20 + 30);
+        int tableHeight = Math.min(250, numRounds * 20 + 30);
+        int windowHeight = 180 + tableHeight + 70;  // Title(80) + Score(60) + Table + Buttons(70)
         
         setSize(400, windowHeight);
         setLocationRelativeTo(null);
@@ -52,13 +52,13 @@ public class WordyGameResults extends JFrame {
 
         JTable table = new JTable(model);
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(50, 120, 300, tableHeight);
+        scrollPane.setBounds(50, 140, 300, tableHeight);
         add(scrollPane);
 
         // Dashboard Button
         JButton dashboardBtn = new JButton("Dashboard");
-        dashboardBtn.setFont(new Font("Arial", Font.PLAIN, 18));
-        dashboardBtn.setBounds(40, windowHeight - 50, 150, 40);
+        dashboardBtn.setFont(new Font("Arial", Font.PLAIN, 14));
+        dashboardBtn.setBounds(40, windowHeight - 55, 150, 40);
         dashboardBtn.setBackground(new Color(50,50,50));
         dashboardBtn.setForeground(Color.WHITE);
         dashboardBtn.setBorderPainted(false);
@@ -71,8 +71,8 @@ public class WordyGameResults extends JFrame {
 
         // Play Again Button
         JButton playAgainBtn = new JButton("Play Again");
-        playAgainBtn.setFont(new Font("Arial", Font.PLAIN, 18));
-        playAgainBtn.setBounds(200, windowHeight - 50, 150, 40);
+        playAgainBtn.setFont(new Font("Arial", Font.PLAIN, 14));
+        playAgainBtn.setBounds(200, windowHeight - 55, 150, 40);
         playAgainBtn.setBackground(new Color(50, 50, 50));
         playAgainBtn.setForeground(Color.WHITE);
         playAgainBtn.setBorderPainted(false);
