@@ -17,16 +17,13 @@ public class ConfigDAO {
      * @return the configuration value as String, or null if not found
      */
     public String getConfig(String key) {
-        String sql = "SELECT value FROM config WHERE key = ?";
-
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement("SELECT " + key + " FROM config WHERE id = 1")) {
 
-            stmt.setString(1, key);
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return rs.getString("value");
+                return String.valueOf(rs.getInt(key));
             }
 
         } catch (SQLException e) {
@@ -58,41 +55,31 @@ public class ConfigDAO {
     /**
      * Updates a configuration value.
      *
-     * @param key the configuration key
+     * @param key the configuration key (wait_time or round_duration)
      * @param value the new value
      * @return true if updated successfully
      */
     public boolean updateConfig(String key, String value) {
-        // First check if key exists
-        String checkSql = "SELECT COUNT(*) as count FROM config WHERE key = ?";
-        String insertSql = "INSERT INTO config (key, value) VALUES (?, ?)";
-        String updateSql = "UPDATE config SET value = ? WHERE key = ?";
+        // Validate key to prevent SQL injection
+        if (!key.equals("wait_time") && !key.equals("round_duration")) {
+            System.err.println("Invalid config key: " + key);
+            return false;
+        }
+
+        String updateSql = "UPDATE config SET " + key + " = ? WHERE id = 1";
 
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement checkStmt = conn.prepareStatement(checkSql)) {
+             PreparedStatement stmt = conn.prepareStatement(updateSql)) {
 
-            checkStmt.setString(1, key);
-            ResultSet rs = checkStmt.executeQuery();
-
-            boolean exists = false;
-            if (rs.next()) {
-                exists = rs.getInt("count") > 0;
-            }
-
-            // Insert or update based on existence
-            PreparedStatement stmt;
-            if (exists) {
-                stmt = conn.prepareStatement(updateSql);
-                stmt.setString(1, value);
-                stmt.setString(2, key);
-            } else {
-                stmt = conn.prepareStatement(insertSql);
-                stmt.setString(1, key);
-                stmt.setString(2, value);
+            try {
+                int intValue = Integer.parseInt(value);
+                stmt.setInt(1, intValue);
+            } catch (NumberFormatException e) {
+                System.err.println("Invalid value for config: " + value);
+                return false;
             }
 
             int rowsAffected = stmt.executeUpdate();
-            stmt.close();
             return rowsAffected > 0;
 
         } catch (SQLException e) {
