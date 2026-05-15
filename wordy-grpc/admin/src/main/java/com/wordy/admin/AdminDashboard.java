@@ -64,6 +64,23 @@ public class AdminDashboard extends JFrame {
         title.setBounds(30, 20, 300, 40);
         mainPanel.add(title);
 
+        // Settings Button
+        JButton settingsBtn = new JButton("Settings");
+        settingsBtn.setFont(new Font("Arial", Font.PLAIN, 12));
+        settingsBtn.setBounds(710, 35, 90, 25);
+        settingsBtn.setBackground(new Color(200, 200, 200));
+        settingsBtn.setForeground(Color.BLACK);
+        settingsBtn.setFocusPainted(false);
+        settingsBtn.setBorder(BorderFactory.createEmptyBorder());
+        settingsBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        settingsBtn.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new AdminGameSettingsUI().setVisible(true);
+            }
+        });
+        mainPanel.add(settingsBtn);
+
         // Logout Button
         JButton logoutBtn = new JButton("Logout");
         logoutBtn.setFont(new Font("Arial", Font.PLAIN, 12));
@@ -186,6 +203,12 @@ public class AdminDashboard extends JFrame {
                 tablePanel.repaint();
             } catch (Exception e) {
                 System.err.println("Error loading player data: " + e.getMessage());
+                e.printStackTrace();
+                JLabel errorLabel = new JLabel("Error loading players. Ensure server is running and database is connected.");
+                errorLabel.setForeground(Color.RED);
+                errorLabel.setBounds(30, 200, 600, 30);
+                tablePanel.add(errorLabel);
+                tablePanel.repaint();
             }
         });
     }

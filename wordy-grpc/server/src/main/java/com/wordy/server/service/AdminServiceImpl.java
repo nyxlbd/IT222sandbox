@@ -134,15 +134,46 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
      */
     @Override
     public void deletePlayer(PlayerId request, StreamObserver<Status> responseObserver) {
-        // PlayerId only has id field, but we need username
-        // For now, we'll return an error since we can't delete without username
-        // TODO: Modify proto to use username instead of id, or add username field
-
-        responseObserver.onNext(Status.newBuilder()
-                .setSuccess(false)
-                .setMessage("Delete by ID not supported. Please use username.")
-                .build());
-        responseObserver.onCompleted();
+        try {
+            int playerId = request.getId();
+            
+            // Get username from ID
+            String username = userDAO.getUsernameById(playerId);
+            
+            if (username == null) {
+                responseObserver.onNext(Status.newBuilder()
+                        .setSuccess(false)
+                        .setMessage("Player with ID " + playerId + " not found")
+                        .build());
+                responseObserver.onCompleted();
+                return;
+            }
+            
+            // Delete the user
+            boolean deleted = userDAO.deleteUser(username);
+            
+            if (deleted) {
+                responseObserver.onNext(Status.newBuilder()
+                        .setSuccess(true)
+                        .setMessage("Player " + username + " deleted successfully")
+                        .build());
+            } else {
+                responseObserver.onNext(Status.newBuilder()
+                        .setSuccess(false)
+                        .setMessage("Failed to delete player " + username)
+                        .build());
+            }
+            
+            responseObserver.onCompleted();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onNext(Status.newBuilder()
+                    .setSuccess(false)
+                    .setMessage("Error deleting player: " + e.getMessage())
+                    .build());
+            responseObserver.onCompleted();
+        }
     }
 
     /**
@@ -154,9 +185,34 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
      */
     @Override
     public void searchPlayer(SearchQuery request, StreamObserver<PlayerList> responseObserver) {
-        // TODO: Implement player search functionality
-        responseObserver.onNext(PlayerList.newBuilder().build());
-        responseObserver.onCompleted();
+        try {
+            String keyword = request.getKeyword();
+            java.util.List<Object[]> playerList = userDAO.searchPlayers(keyword);
+            
+            PlayerList.Builder playerListBuilder = PlayerList.newBuilder();
+            
+            for (Object[] playerData : playerList) {
+                int id = (int) playerData[0];
+                String username = (String) playerData[1];
+                int wins = (int) playerData[2];
+                
+                Player player = Player.newBuilder()
+                        .setId(id)
+                        .setUsername(username)
+                        .setWins(wins)
+                        .build();
+                        
+                playerListBuilder.addPlayers(player);
+            }
+            
+            responseObserver.onNext(playerListBuilder.build());
+            responseObserver.onCompleted();
+            
+        } catch (Exception e) {
+            e.printStackTrace();
+            responseObserver.onNext(PlayerList.newBuilder().build());
+            responseObserver.onCompleted();
+        }
     }
 
     /**

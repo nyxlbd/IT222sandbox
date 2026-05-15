@@ -2,6 +2,7 @@ com\wordy\admin\AdminDashboard$2.class
 com\wordy\admin\ManagePlayersUI.class
 com\wordy\admin\service\AdminServiceClient$PlayerData.class
 com\wordy\admin\AdminApp.class
+com\wordy\admin\AdminDashboard$4.class
 com\wordy\admin\AdminDashboard$3.class
 com\wordy\admin\service\AdminServiceClient.class
 com\wordy\admin\AdminDashboard.class

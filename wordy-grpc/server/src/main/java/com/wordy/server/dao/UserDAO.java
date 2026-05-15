@@ -199,4 +199,73 @@ public class UserDAO {
 
         return false;
     }
+
+    /**
+     * Retrieves all players or searches for players by username
+     * 
+     * @param searchQuery search term (empty for all players)
+     * @return List of players with username, wins, role, and id
+     */
+    public java.util.List<Object[]> searchPlayers(String searchQuery) {
+        java.util.List<Object[]> results = new java.util.ArrayList<>();
+        String sql;
+        
+        if (searchQuery == null || searchQuery.trim().isEmpty()) {
+            // Get all players
+            sql = "SELECT id, username, COALESCE(wins, 0) as wins, role FROM users WHERE role = 'player' ORDER BY username";
+        } else {
+            // Search by username
+            sql = "SELECT id, username, COALESCE(wins, 0) as wins, role FROM users WHERE role = 'player' AND username LIKE ? ORDER BY username";
+        }
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            if (searchQuery != null && !searchQuery.trim().isEmpty()) {
+                stmt.setString(1, "%" + searchQuery + "%");
+            }
+
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                Object[] record = new Object[4];
+                record[0] = rs.getInt("id");                    // id
+                record[1] = rs.getString("username");           // username
+                record[2] = rs.getInt("wins");                  // wins
+                record[3] = rs.getString("role");               // role
+                results.add(record);
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return results;
+    }
+
+    /**
+     * Gets username by user ID
+     * 
+     * @param userId the user ID
+     * @return username or null if not found
+     */
+    public String getUsernameById(int userId) {
+        String sql = "SELECT username FROM users WHERE id = ?";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return rs.getString("username");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
+    }
 }
