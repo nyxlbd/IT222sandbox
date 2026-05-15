@@ -82,6 +82,13 @@ public class GameManager {
                 waitingPlayers.remove(); // Remove first player from waiting queue
                 
                 System.out.println("Player " + username + " joined game " + gameId);
+                
+                // Check if game can start with the new player count
+                if (session.getPlayerCount() >= MIN_PLAYERS_TO_START && !session.hasGameStarted()) {
+                    session.markGameStarted();
+                    System.out.println("Game " + gameId + " started with " + session.getPlayerCount() + " players");
+                }
+                
                 return gameId;
             }
         }

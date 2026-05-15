@@ -12,9 +12,6 @@ import com.wordy.server.dao.UserDAO;
 import com.wordy.server.dao.ConfigDAO;
 import io.grpc.stub.StreamObserver;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * Admin Service Backend Implementation
  * Responsible Team Members:

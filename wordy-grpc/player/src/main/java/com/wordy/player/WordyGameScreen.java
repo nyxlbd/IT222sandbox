@@ -27,7 +27,6 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
     private List<String> submissions;
     private int timeRemaining = 30;
     private int currentRound;
-    private final int MAX_ROUNDS = 3;
     private Timer gameTimer;
     private GameStateManager gameManager;
     private int playerWins = 0;

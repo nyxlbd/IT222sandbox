@@ -6,8 +6,6 @@ import com.wordy.common.WordyLoginUI;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 /**
  * Game Settings Configuration UI
