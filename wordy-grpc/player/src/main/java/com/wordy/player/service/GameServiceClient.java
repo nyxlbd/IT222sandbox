@@ -2,7 +2,6 @@ package com.wordy.player.service;
 
 import com.wordy.player.model.GameUpdate;
 import com.wordy.proto.GameServiceGrpc;
-import com.wordy.proto.GameUpdate.Builder;
 import com.wordy.proto.JoinGameRequest;
 import com.wordy.proto.JoinGameResponse;
 import com.wordy.proto.GameRequest;
