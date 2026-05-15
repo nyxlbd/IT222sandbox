@@ -8,6 +8,8 @@ import com.wordy.proto.LogoutResponse;
 import io.grpc.Channel;
 
 /**
+ * Authentication Service Client
+ * Responsible Team Member: NICOLE DEOCALES
  * Wrapper client for gRPC AuthService.
  * Handles login and logout operations with the server.
  */

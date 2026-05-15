@@ -12,6 +12,11 @@ import com.wordy.player.service.GameStateManager;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Game Screen UI
+ * Responsible Team Member: JAN VON KRISTOFF RASALAN
+ * Main game screen where players view letters, submit words, and track round progress
+ */
 public class WordyGameScreen extends JFrame implements GameStateManager.GameUpdateListener {
     private JLabel timerLabel;
     private JTextField wordInputField;
@@ -30,6 +35,13 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
     private List<Integer> playerRoundScores = new ArrayList<>();
     private List<Integer> opponentRoundScores = new ArrayList<>();
 
+    /**
+     * Initializes and displays the main game screen.
+     * Responsible Team Member: JAN VON KRISTOFF RASALAN
+     * Sets up UI components: letter display, timer, word input field, submissions panel.
+     * 
+     * @param round the starting round number
+     */
     public WordyGameScreen(int round) {
         this.currentRound = round;
         setTitle("Wordy - Game");

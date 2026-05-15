@@ -12,14 +12,23 @@ import io.grpc.stub.StreamObserver;
 import java.util.List;
 
 /**
- * gRPC service implementation for leaderboard operations.
- * Fetches top players and longest words from database.
+ * Leaderboard Service Backend Implementation
+ * Responsible Team Member: JACKSON MARIANO
+ * Fetches top players by wins and longest words submitted, provides ranking data
+ * Used for: Top Players UI, Round Result/Game End Backend
  */
 public class LeaderboardServiceImpl extends LeaderboardServiceGrpc.LeaderboardServiceImplBase {
     
     private final UserDAO userDAO = new UserDAO();
     private final WordDAO wordDAO = new WordDAO();
 
+    /**
+     * Retrieves leaderboard data including top players and longest words.
+     * Responsible Team Member: JACKSON MARIANO
+     * 
+     * @param request Empty request (no parameters needed)
+     * @param responseObserver Observer for sending leaderboard response
+     */
     @Override
     public void getLeaderboard(Empty request, StreamObserver<LeaderboardResponse> responseObserver) {
         try {

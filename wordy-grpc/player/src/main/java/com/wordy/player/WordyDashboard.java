@@ -8,6 +8,11 @@ import java.awt.event.ActionListener;
 import com.wordy.common.WordyLoginUI;
 import com.wordy.player.service.GameStateManager;
 
+/**
+ * Home Screen / Dashboard UI
+ * Responsible Team Member: JAN VON KRISTOFF RASALAN
+ * Main dashboard where players can view game rules, join games, or access leaderboard
+ */
 public class WordyDashboard extends JFrame {
 
     public static final String GAME_RULES =
@@ -39,10 +44,21 @@ public class WordyDashboard extends JFrame {
 
     private String currentUsername;
 
+    /**
+     * Creates a new dashboard with no username.
+     * Responsible Team Member: JAN VON KRISTOFF RASALAN
+     */
     public WordyDashboard() {
         this(null);
     }
 
+    /**
+     * Creates and displays the home screen dashboard for a logged-in player.
+     * Responsible Team Member: JAN VON KRISTOFF RASALAN
+     * Sets up UI components, buttons, and game rules display.
+     * 
+     * @param username the logged-in player's username (null if not authenticated)
+     */
     public WordyDashboard(String username) {
         this.currentUsername = username;
         

@@ -19,8 +19,11 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * gRPC service implementation for game operations.
- * Handles: joining games, submitting words, streaming game updates.
+ * Game Service Backend Implementation
+ * Responsible Team Members:
+ *   - Game Screen Backend: NICOLE DEOCALES (overall game mechanics, word submission)
+ *   - Game Lobby Backend: KATHRINA SHAYNE RAGOS (game joining, lobby management)
+ * Handles: joining games, submitting words, streaming game updates
  */
 public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
     
@@ -33,6 +36,13 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
     // Track client streams for sending updates: gameId -> list of StreamObservers
     private Map<String, List<StreamObserver<GameUpdate>>> gameStreams = new ConcurrentHashMap<>();
 
+    /**
+     * Handles player joining a game or creating a new game session.
+     * Responsible Team Member: KATHRINA SHAYNE RAGOS (Game Lobby Backend)
+     * 
+     * @param request Contains username of player joining
+     * @param responseObserver Observer for sending join response
+     */
     @Override
     public void joinGame(JoinGameRequest request, StreamObserver<JoinGameResponse> responseObserver) {
         String username = request.getUsername();
@@ -78,6 +88,15 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
         }
     }
 
+    /**
+     * Processes word submission from a player during active game.
+     * Responsible Team Member: NICOLE DEOCALES (Game Screen Backend)
+     * 
+     * Validates word against available letters, saves to database, and sends response
+     * 
+     * @param request Contains username and word submission
+     * @param responseObserver Observer for sending word validation response
+     */
     @Override
     public void submitWord(WordRequest request, StreamObserver<WordResponse> responseObserver) {
         String username = request.getUsername();
@@ -135,6 +154,15 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
         }
     }
 
+    /**
+     * Establishes a bidirectional stream for real-time game updates.
+     * Responsible Team Member: NICOLE DEOCALES (Game Screen Backend)
+     * 
+     * Registers player stream, sends initial game state, and maintains connection for updates
+     * 
+     * @param request Contains username of player
+     * @param responseObserver Observer for sending continuous game updates
+     */
     @Override
     public void streamGame(GameRequest request, StreamObserver<GameUpdate> responseObserver) {
         String username = request.getUsername();

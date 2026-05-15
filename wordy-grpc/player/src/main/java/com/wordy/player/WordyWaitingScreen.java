@@ -6,6 +6,11 @@ import java.awt.*;
 import com.wordy.player.model.GameUpdate;
 import com.wordy.player.service.GameStateManager;
 
+/**
+ * Game Lobby UI - Waiting Screen
+ * Responsible Team Member: JAN VON KRISTOFF RASALAN
+ * Displays waiting screen when a player joins a game and is waiting for other players
+ */
 public class WordyWaitingScreen extends JDialog implements GameStateManager.GameUpdateListener {
     private int playerCount = 1; // Start with 1 (self)
     private final int requiredPlayers = 2;
@@ -14,6 +19,13 @@ public class WordyWaitingScreen extends JDialog implements GameStateManager.Game
     private GameStateManager gameManager;
     private boolean gameStarted = false;
 
+    /**
+     * Initializes and displays the game lobby waiting screen.
+     * Responsible Team Member: JAN VON KRISTOFF RASALAN
+     * Shows player count and waits for game to start via server stream.
+     * 
+     * @param parent the parent frame for dialog modality
+     */
     public WordyWaitingScreen(JFrame parent) {
         super(parent, "Wordy", true);
         setSize(400, 150);

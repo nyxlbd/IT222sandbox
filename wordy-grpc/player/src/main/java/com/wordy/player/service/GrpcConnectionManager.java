@@ -7,6 +7,8 @@ import com.wordy.common.config.ClientConfiguration;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * gRPC Connection Manager (Player Module Infrastructure)
+ * Responsible Team Members: NICOLE DEOCALES, JACKSON MARIANO
  * Singleton class to manage gRPC channel connection to the Wordy server.
  * Provides a single connection instance used by all service clients.
  * Server host and port are configured via ClientConfiguration.

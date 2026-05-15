@@ -1,5 +1,6 @@
 package com.wordy.admin;
 
+import com.wordy.admin.service.AdminServiceClient;
 import com.wordy.common.WordyLoginUI;
 
 import javax.swing.*;
@@ -8,9 +9,27 @@ import java.awt.event.ActionEvent;
 
 import java.awt.event.ActionListener;
 
+/**
+ * Edit/Add Player Account UI
+ * Responsible Team Member: JENNY ANNE AWACAN
+ * Form interface for editing existing player information or adding new player accounts
+ */
 public class AdminEditAccountUI extends JFrame {
 
+    private AdminServiceClient adminServiceClient;
+    private boolean isEditMode;
+
+    /**
+     * Initializes the player edit/add account form dialog.
+     * Responsible Team Member: JENNY ANNE AWACAN
+     * Provides form fields for updating player information or creating new accounts.
+     * 
+     * @param username the username of the player to edit, or null to create new
+     */
     public AdminEditAccountUI(String username) {
+        this.adminServiceClient = new AdminServiceClient();
+        this.isEditMode = username != null && !username.isEmpty();
+        
         setTitle("Wordy - Admin");
         setSize(1000, 700);
         setMinimumSize(new Dimension(1000, 700));
@@ -75,12 +94,12 @@ public class AdminEditAccountUI extends JFrame {
         formPanel.setBackground(new Color(210, 210, 210));
         mainPanel.add(formPanel);
 
-        JLabel title = new JLabel("Edit Player Account");
+        JLabel title = new JLabel(isEditMode ? "Edit Player Account" : "Create New Player Account");
         title.setFont(new Font("Arial", Font.BOLD, 28));
         title.setBounds(20, 20, 400, 40);
         formPanel.add(title);
 
-        JLabel subtitle = new JLabel("Update Player information");
+        JLabel subtitle = new JLabel(isEditMode ? "Update Player information" : "Add new player to the system");
         subtitle.setFont(new Font("Arial", Font.PLAIN, 18));
         subtitle.setBounds(20, 55, 300, 30);
         formPanel.add(subtitle);
@@ -103,9 +122,10 @@ public class AdminEditAccountUI extends JFrame {
         formPanel.add(userLbl);
 
         y += 20;
-        JTextField userField = new JTextField(username);
+        JTextField userField = new JTextField(username != null ? username : "");
         userField.setBounds(leftFieldX, y, fieldWidth, fieldHeight);
         userField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        userField.setEditable(!isEditMode); // Disable editing username in edit mode
         formPanel.add(userField);
 
         y -= 20;
@@ -114,7 +134,7 @@ public class AdminEditAccountUI extends JFrame {
         formPanel.add(statusLbl);
 
         y += 20;
-        JTextField statusField = new JTextField("Online");
+        JTextField statusField = new JTextField("Active");
         statusField.setBounds(rightFieldX, y, 290, fieldHeight);
         statusField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
         formPanel.add(statusField);
@@ -139,6 +159,7 @@ public class AdminEditAccountUI extends JFrame {
         JTextField memberField = new JTextField("2026/01/01");
         memberField.setBounds(leftFieldX, y, fieldWidth, fieldHeight);
         memberField.setBorder(BorderFactory.createEmptyBorder(5, 10, 5, 10));
+        memberField.setEditable(false); // Read-only
         formPanel.add(memberField);
 
         y += gap;
@@ -153,7 +174,7 @@ public class AdminEditAccountUI extends JFrame {
         formPanel.add(remarksField);
 
 
-        JButton saveBtn = new JButton("Save Changes");
+        JButton saveBtn = new JButton(isEditMode ? "Update Player" : "Create Player");
         JButton cancelBtn = new JButton("Cancel");
         JButton deleteBtn = new JButton("Delete Account");
 
@@ -171,90 +192,64 @@ public class AdminEditAccountUI extends JFrame {
         formPanel.add(saveBtn);
         formPanel.add(cancelBtn);
         formPanel.add(deleteBtn);
+        
+        // Hide delete button in create mode
+        deleteBtn.setVisible(isEditMode);
 
         cancelBtn.addActionListener(e -> dispose());
 
         saveBtn.addActionListener(e -> {
+            String playerUsername = userField.getText().trim();
+            String playerPassword = new String(passField.getPassword()).trim();
+            String playerStatus = statusField.getText().trim();
 
-            JDialog dialog = new JDialog(this, "Save Changes", true);
-            dialog.setSize(350, 180);
-            dialog.setLayout(null);
-            dialog.setLocationRelativeTo(this);
+            if (playerUsername.isEmpty() || playerPassword.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Username and password cannot be empty.", "Validation Error", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
 
-            JPanel panel = new JPanel();
-            panel.setLayout(null);
-            panel.setBackground(new Color(240, 240, 240));
-            panel.setBounds(0, 0, 350, 180);
-            dialog.add(panel);
+            boolean success;
+            if (isEditMode) {
+                success = adminServiceClient.updatePlayer(playerUsername, playerPassword, playerStatus);
+            } else {
+                success = adminServiceClient.createPlayer(playerUsername, playerPassword);
+            }
 
-            JLabel msg = new JLabel("Changes saved successfully!");
-            msg.setBounds(0, 30, 350, 30);
-            msg.setHorizontalAlignment(SwingConstants.CENTER);
-            panel.add(msg);
-
-            JButton okBtn = new JButton("OK");
-
-            okBtn.setFocusPainted(false);
-            okBtn.setBorderPainted(false);
-            okBtn.setBackground(new Color(200, 200, 200));
-            okBtn.setCursor(new Cursor(Cursor.HAND_CURSOR));
-
-            okBtn.setBounds(130, 90, 80, 30);
-            panel.add(okBtn);
-
-            okBtn.addActionListener(ev -> dialog.dispose());
-
-            dialog.setVisible(true);
+            if (success) {
+                JOptionPane.showMessageDialog(this, 
+                    (isEditMode ? "Player updated" : "Player created") + " successfully!", 
+                    "Success", 
+                    JOptionPane.INFORMATION_MESSAGE);
+                dispose();
+            } else {
+                JOptionPane.showMessageDialog(this,
+                    "Failed to " + (isEditMode ? "update" : "create") + " player.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            }
         });
 
         deleteBtn.addActionListener(e -> {
+            int confirm = JOptionPane.showConfirmDialog(this,
+                "Are you sure you want to delete this account?",
+                "Confirm Delete",
+                JOptionPane.YES_NO_OPTION);
 
-            JDialog dialog = new JDialog(this, "Confirm Delete", true);
-            dialog.setSize(350, 180);
-            dialog.setLayout(null);
-            dialog.setLocationRelativeTo(this);
-
-            JPanel panel = new JPanel();
-            panel.setLayout(null);
-            panel.setBackground(new Color(240, 240, 240));
-            panel.setBounds(0, 0, 350, 180);
-            dialog.add(panel);
-
-            JLabel msg = new JLabel("Are you sure you want to delete this account?");
-            msg.setBounds(30, 30, 300, 30);
-            panel.add(msg);
-
-            JButton yesBtn = new JButton("Yes");
-            JButton noBtn = new JButton("No");
-
-            yesBtn.setFocusPainted(false);
-            yesBtn.setBorderPainted(false);
-            yesBtn.setBackground(new Color(200, 200, 200));
-
-            noBtn.setFocusPainted(false);
-            noBtn.setBorderPainted(false);
-            noBtn.setBackground(new Color(200, 200, 200));
-
-            yesBtn.setBounds(70, 90, 80, 30);
-            noBtn.setBounds(180, 90, 80, 30);
-
-            panel.add(yesBtn);
-            panel.add(noBtn);
-
-            yesBtn.addActionListener(ev -> {
-                String usernameToDelete = userField.getText();
-
-                JOptionPane.showMessageDialog(this,
-                        "Account '" + usernameToDelete + "' deleted.");
-
-                dialog.dispose();
-                dispose();
-            });
-
-            // NO action
-            noBtn.addActionListener(ev -> dialog.dispose());
-
-            dialog.setVisible(true);
+            if (confirm == JOptionPane.YES_OPTION) {
+                String playerToDelete = userField.getText().trim();
+                if (adminServiceClient.deletePlayer(playerToDelete)) {
+                    JOptionPane.showMessageDialog(this,
+                        "Account '" + playerToDelete + "' deleted successfully.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
+                    dispose();
+                } else {
+                    JOptionPane.showMessageDialog(this,
+                        "Failed to delete account.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
+                }
+            }
         });
 
         setVisible(true);

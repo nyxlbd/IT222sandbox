@@ -1,5 +1,7 @@
 package com.wordy.admin;
 
+import com.wordy.admin.service.AdminServiceClient;
+import com.wordy.admin.service.AdminServiceClient.PlayerData;
 import com.wordy.common.WordyLoginUI;
 
 import javax.swing.*;
@@ -8,19 +10,39 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.FocusAdapter;
 import java.awt.event.FocusEvent;
+import java.util.List;
 
 
 
+/**
+ * Admin Dashboard UI
+ * Responsible Team Member: JENNY ANNE AWACAN
+ * Main admin interface for managing players and accessing admin functions
+ */
 public class AdminDashboard extends JFrame {
 
     private String currentUsername;
+    private AdminServiceClient adminServiceClient;
+    private JPanel tablePanel;
 
+    /**
+     * Creates a new admin dashboard with no username.
+     * Responsible Team Member: JENNY ANNE AWACAN
+     */
     public AdminDashboard() {
         this(null);
     }
 
+    /**
+     * Initializes and displays the admin dashboard interface.
+     * Responsible Team Member: JENNY ANNE AWACAN
+     * Sets up player management section, search functionality, and admin controls.
+     * 
+     * @param username the logged-in admin's username (null if not authenticated)
+     */
     public AdminDashboard(String username) {
         this.currentUsername = username;
+        this.adminServiceClient = new AdminServiceClient();
         setTitle("Wordy - Admin");
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -114,9 +136,12 @@ public class AdminDashboard extends JFrame {
             }
         });
 
+        // Search button handler
+        searchField.addActionListener(e -> refreshPlayerTable(tablePanel, searchField.getText().trim()));
+
 
         // Table
-        JPanel tablePanel = new JPanel();
+        tablePanel = new JPanel();
         tablePanel.setLayout(null);
         tablePanel.setBounds(30, 150, 880, 400);
         tablePanel.setBackground(new Color(210, 210, 210));
@@ -141,14 +166,67 @@ public class AdminDashboard extends JFrame {
             headerStrip.add(header);
         }
 
-        // Sample Rows
-        int y = 80;
-        for (int i = 0; i < 5; i++) {
-            addRow(tablePanel, y, "Name", "Online", "100", "2026/01/01");
-            y += 60;
-        }
+        // Load player data from server
+        loadPlayerData(tablePanel);
+    }
+    /**
+     * Loads player data from the server and displays in the table
+     * Responsible Team Member: JENNY ANNE AWACAN
+     */
+    private void loadPlayerData(JPanel tablePanel) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                List<PlayerData> players = adminServiceClient.getAllPlayers();
+                int y = 80;
+                for (PlayerData player : players) {
+                    if (y > 380) break; // Max 5 rows visible
+                    addRow(tablePanel, y, player.username, player.status, String.valueOf(player.wins), player.playerId);
+                    y += 60;
+                }
+                tablePanel.repaint();
+            } catch (Exception e) {
+                System.err.println("Error loading player data: " + e.getMessage());
+            }
+        });
     }
 
+    /**
+     * Refreshes the player table with search results or all players
+     * Responsible Team Member: JENNY ANNE AWACAN
+     * 
+     * @param tablePanel the table panel to refresh
+     * @param searchQuery the search term (empty string to show all)
+     */
+    private void refreshPlayerTable(JPanel tablePanel, String searchQuery) {
+        // Remove all player rows (keep header)
+        java.awt.Component[] components = tablePanel.getComponents();
+        for (java.awt.Component comp : components) {
+            if (comp instanceof JPanel && comp != tablePanel.getComponent(0)) {
+                tablePanel.remove(comp);
+            }
+        }
+
+        SwingUtilities.invokeLater(() -> {
+            try {
+                List<PlayerData> players;
+                if (searchQuery == null || searchQuery.isEmpty()) {
+                    players = adminServiceClient.getAllPlayers();
+                } else {
+                    players = adminServiceClient.searchPlayers(searchQuery);
+                }
+
+                int y = 80;
+                for (PlayerData player : players) {
+                    if (y > 380) break; // Max 5 rows visible
+                    addRow(tablePanel, y, player.username, player.status, String.valueOf(player.wins), player.playerId);
+                    y += 60;
+                }
+                tablePanel.repaint();
+            } catch (Exception e) {
+                System.err.println("Error refreshing table: " + e.getMessage());
+            }
+        });
+    }
 
     private void addRow(JPanel panel, int y, String name, String status, String wins, String joined) {
 
@@ -234,17 +312,19 @@ public class AdminDashboard extends JFrame {
             dPanel.add(noBtn);
 
             yesBtn.addActionListener(ev -> {
-
-                panel.remove(nameLbl);
-                panel.remove(statusLbl);
-                panel.remove(winsLbl);
-                panel.remove(joinedLbl);
-                panel.remove(editBtn);
-                panel.remove(deleteBtn);
-
-                panel.repaint();
-                panel.revalidate();
-
+                // Call delete service
+                if (adminServiceClient.deletePlayer(name)) {
+                    panel.remove(nameLbl);
+                    panel.remove(statusLbl);
+                    panel.remove(winsLbl);
+                    panel.remove(joinedLbl);
+                    panel.remove(editBtn);
+                    panel.remove(deleteBtn);
+                    panel.repaint();
+                    panel.revalidate();
+                } else {
+                    JOptionPane.showMessageDialog(dialog, "Failed to delete player.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
                 dialog.dispose();
             });
 

@@ -5,7 +5,25 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.util.List;
 
+/**
+ * Game Results / Game End UI
+ * Responsible Team Members:
+ *   - Game End UI: JAN VON KRISTOFF RASALAN (overall screen layout)
+ *   - Round Result UI: ADELYN JOY TELA (round score table display)
+ * Displays final game results, round-by-round breakdown, and allows replaying or returning to dashboard
+ */
 public class WordyGameResults extends JFrame {
+    /**
+     * Displays the final game results and round-by-round score breakdown.
+     * Responsible Team Members:
+     *   - JAN VON KRISTOFF RASALAN (overall layout and result display)
+     *   - ADELYN JOY TELA (round score table)
+     * 
+     * @param yourScore final score for the player
+     * @param opponentScore final score for the opponent
+     * @param playerRoundScores list of scores for each round for the player
+     * @param opponentRoundScores list of scores for each round for the opponent
+     */
     public WordyGameResults(int yourScore, int opponentScore, List<Integer> playerRoundScores, List<Integer> opponentRoundScores) {
         setTitle("Game Results");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

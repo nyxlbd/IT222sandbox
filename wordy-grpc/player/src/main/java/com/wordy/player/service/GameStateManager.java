@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Game State Manager (Singleton)
+ * Responsible Team Member: NICOLE DEOCALES
  * Central manager for game state and service coordination.
  * Provides a high-level interface for UI components to interact with backend services.
  */
@@ -155,6 +157,7 @@ public class GameStateManager {
 
     /**
      * Starts listening to game updates from the server.
+     * Responsible Team Member: NICOLE DEOCALES
      * Updates are delivered via the registered GameUpdateListeners.
      */
     public void startGameStream() {

@@ -12,6 +12,8 @@ import io.grpc.Channel;
 import io.grpc.stub.StreamObserver;
 
 /**
+ * Game Service Client
+ * Responsible Team Member: NICOLE DEOCALES
  * Wrapper client for gRPC GameService.
  * Handles game operations: join game, submit words, and stream game updates.
  */

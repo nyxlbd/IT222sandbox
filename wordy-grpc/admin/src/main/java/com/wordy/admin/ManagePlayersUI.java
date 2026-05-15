@@ -1,11 +1,29 @@
 package com.wordy.admin;
 
+import com.wordy.admin.service.AdminServiceClient;
+import com.wordy.admin.service.AdminServiceClient.PlayerData;
+
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
+/**
+ * Manage Players UI
+ * Responsible Team Member: ADELYN JOY TELA
+ * Interface for viewing player list, searching, and managing player accounts with action buttons
+ */
 public class ManagePlayersUI extends JFrame {
 
+    private AdminServiceClient adminServiceClient;
+    private JPanel tablePanel;
+
+    /**
+     * Initializes and displays the player management interface.
+     * Responsible Team Member: ADELYN JOY TELA
+     * Shows player list with search, edit, and delete action buttons.
+     */
     public ManagePlayersUI() {
+        this.adminServiceClient = new AdminServiceClient();
         setTitle("Wordy - Admin");
         setSize(1000, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -59,8 +77,11 @@ public class ManagePlayersUI extends JFrame {
         searchField.setBounds(680, 170, 200, 25);
         mainContainer.add(searchField);
 
+        // Add search listener
+        searchField.addActionListener(e -> refreshPlayerTable(tablePanel, searchField.getText().trim()));
+
         // ===== Table Panel =====
-        JPanel tablePanel = new JPanel();
+        tablePanel = new JPanel();
         tablePanel.setBounds(20, 210, 900, 360);
         tablePanel.setBackground(new Color(220, 220, 220));
         tablePanel.setLayout(null);
@@ -77,52 +98,130 @@ public class ManagePlayersUI extends JFrame {
             tablePanel.add(headerLabel);
         }
 
-        // ===== Sample Data =====
-        for (int i = 0; i < 5; i++) {
-            int y = 50 + (i * 60);
+        // Load player data from server
+        loadPlayerData(tablePanel);
+    }
 
-            JLabel username = new JLabel("Name");
-            username.setBounds(xPos[0], y, 100, 30);
-            tablePanel.add(username);
+    /**
+     * Loads player data from the server and displays in the table
+     * Responsible Team Member: ADELYN JOY TELA
+     */
+    private void loadPlayerData(JPanel tablePanel) {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                List<PlayerData> players = adminServiceClient.getAllPlayers();
+                int[] xPos = {80, 220, 360, 500, 680};
+                int y = 50;
+                for (PlayerData player : players) {
+                    if (y > 290) break; // Max 5 rows visible
+                    addPlayerRow(tablePanel, y, player.username, player.status, String.valueOf(player.wins), player.playerId, xPos);
+                    y += 60;
+                }
+                tablePanel.repaint();
+            } catch (Exception e) {
+                System.err.println("Error loading player data: " + e.getMessage());
+            }
+        });
+    }
 
-            JLabel status = new JLabel("Online");
-            status.setBounds(xPos[1], y, 100, 30);
-            tablePanel.add(status);
-
-            JLabel wins = new JLabel("100");
-            wins.setBounds(xPos[2], y, 100, 30);
-            tablePanel.add(wins);
-
-            JLabel joined = new JLabel("2026/01/01");
-            joined.setBounds(xPos[3], y, 120, 30);
-            tablePanel.add(joined);
-
-            // Edit Button
-            JButton editBtn = new JButton("Edit");
-            editBtn.setBounds(xPos[4], y, 60, 25);
-            editBtn.setBackground(new Color(60, 60, 60)); // darker
-            editBtn.setForeground(Color.WHITE);
-            editBtn.setFocusPainted(false);
-            editBtn.setBorder(BorderFactory.createLineBorder(new Color(90,90,90), 1, true));
-            tablePanel.add(editBtn);
-
-            // Delete Button
-            JButton deleteBtn = new JButton("Delete");
-            deleteBtn.setBounds(xPos[4] + 70, y, 70, 25);
-            deleteBtn.setBackground(new Color(60, 60, 60)); // darker
-            deleteBtn.setForeground(Color.WHITE);
-            deleteBtn.setFocusPainted(false);
-            deleteBtn.setBorder(BorderFactory.createLineBorder(new Color(90,90,90), 1, true));
-            tablePanel.add(deleteBtn);
-
-            // Row Divider
-            if (i < 4) {
-                JSeparator sep = new JSeparator();
-                sep.setBounds(20, y + 40, 860, 1);
-                sep.setForeground(new Color(180, 180, 180));
-                tablePanel.add(sep);
+    /**
+     * Refreshes the player table with search results or all players
+     * Responsible Team Member: ADELYN JOY TELA
+     * 
+     * @param tablePanel the table panel to refresh
+     * @param searchQuery the search term (empty string to show all)
+     */
+    private void refreshPlayerTable(JPanel tablePanel, String searchQuery) {
+        // Remove all player rows (keep header)
+        java.awt.Component[] components = tablePanel.getComponents();
+        for (java.awt.Component comp : components) {
+            if (!(comp instanceof JLabel && comp.getBounds().y < 50)) {
+                tablePanel.remove(comp);
             }
         }
+
+        SwingUtilities.invokeLater(() -> {
+            try {
+                List<PlayerData> players;
+                if (searchQuery == null || searchQuery.isEmpty()) {
+                    players = adminServiceClient.getAllPlayers();
+                } else {
+                    players = adminServiceClient.searchPlayers(searchQuery);
+                }
+
+                int[] xPos = {80, 220, 360, 500, 680};
+                int y = 50;
+                for (PlayerData player : players) {
+                    if (y > 290) break; // Max 5 rows visible
+                    addPlayerRow(tablePanel, y, player.username, player.status, String.valueOf(player.wins), player.playerId, xPos);
+                    y += 60;
+                }
+                tablePanel.repaint();
+            } catch (Exception e) {
+                System.err.println("Error refreshing table: " + e.getMessage());
+            }
+        });
+    }
+
+    /**
+     * Adds a player row to the table
+     * Responsible Team Member: ADELYN JOY TELA
+     */
+    private void addPlayerRow(JPanel tablePanel, int y, String username, String status, String wins, String joined, int[] xPos) {
+        JLabel usernameLabel = new JLabel(username);
+        usernameLabel.setBounds(xPos[0], y, 100, 30);
+        tablePanel.add(usernameLabel);
+
+        JLabel statusLabel = new JLabel(status);
+        statusLabel.setBounds(xPos[1], y, 100, 30);
+        tablePanel.add(statusLabel);
+
+        JLabel winsLabel = new JLabel(wins);
+        winsLabel.setBounds(xPos[2], y, 100, 30);
+        tablePanel.add(winsLabel);
+
+        JLabel joinedLabel = new JLabel(joined);
+        joinedLabel.setBounds(xPos[3], y, 120, 30);
+        tablePanel.add(joinedLabel);
+
+        // Edit Button
+        JButton editBtn = new JButton("Edit");
+        editBtn.setBounds(xPos[4], y, 60, 25);
+        editBtn.setBackground(new Color(60, 60, 60));
+        editBtn.setForeground(Color.WHITE);
+        editBtn.setFocusPainted(false);
+        editBtn.setBorder(BorderFactory.createLineBorder(new Color(90,90,90), 1, true));
+        editBtn.addActionListener(e -> new AdminEditAccountUI(username).setVisible(true));
+        tablePanel.add(editBtn);
+
+        // Delete Button
+        JButton deleteBtn = new JButton("Delete");
+        deleteBtn.setBounds(xPos[4] + 70, y, 70, 25);
+        deleteBtn.setBackground(new Color(60, 60, 60));
+        deleteBtn.setForeground(Color.WHITE);
+        deleteBtn.setFocusPainted(false);
+        deleteBtn.setBorder(BorderFactory.createLineBorder(new Color(90,90,90), 1, true));
+        deleteBtn.addActionListener(e -> {
+            if (adminServiceClient.deletePlayer(username)) {
+                tablePanel.remove(usernameLabel);
+                tablePanel.remove(statusLabel);
+                tablePanel.remove(winsLabel);
+                tablePanel.remove(joinedLabel);
+                tablePanel.remove(editBtn);
+                tablePanel.remove(deleteBtn);
+                tablePanel.repaint();
+                tablePanel.revalidate();
+            } else {
+                JOptionPane.showMessageDialog(this, "Failed to delete player.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+        tablePanel.add(deleteBtn);
+
+        // Row Divider
+        JSeparator sep = new JSeparator();
+        sep.setBounds(20, y + 40, 860, 1);
+        sep.setForeground(new Color(180, 180, 180));
+        tablePanel.add(sep);
     }
 
     public static void main(String[] args) {

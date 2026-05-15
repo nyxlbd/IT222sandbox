@@ -16,7 +16,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * gRPC service implementation for admin operations.
+ * Admin Service Backend Implementation
+ * Responsible Team Members:
+ *   - Admin Dashboard Backend: KATHRINA SHAYNE RAGOS (overall admin operations)
+ *   - Manage Players Backend: CHARLES KENNETH DESEAR (player CRUD operations)
+ *   - Game Setting Backend: CHARLES KENNETH DESEAR (configuration management)
  * Handles player management and game configuration updates.
  */
 public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
@@ -24,6 +28,13 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
     private final UserDAO userDAO = new UserDAO();
     private final ConfigDAO configDAO = new ConfigDAO();
 
+    /**
+     * Creates a new player account.
+     * Responsible Team Member: CHARLES KENNETH DESEAR (Manage Players Backend)
+     * 
+     * @param request Contains new player username and password
+     * @param responseObserver Observer for sending creation status
+     */
     @Override
     public void createPlayer(Player request, StreamObserver<Status> responseObserver) {
         String username = request.getUsername();
@@ -67,6 +78,13 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
         }
     }
 
+    /**
+     * Updates an existing player account information.
+     * Responsible Team Member: CHARLES KENNETH DESEAR (Manage Players Backend)
+     * 
+     * @param request Contains username and updated password
+     * @param responseObserver Observer for sending update status
+     */
     @Override
     public void updatePlayer(Player request, StreamObserver<Status> responseObserver) {
         String username = request.getUsername();
@@ -110,6 +128,13 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
         }
     }
 
+    /**
+     * Deletes a player account from the system.
+     * Responsible Team Member: CHARLES KENNETH DESEAR (Manage Players Backend)
+     * 
+     * @param request Contains player ID
+     * @param responseObserver Observer for sending deletion status
+     */
     @Override
     public void deletePlayer(PlayerId request, StreamObserver<Status> responseObserver) {
         // PlayerId only has id field, but we need username
@@ -123,6 +148,13 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    /**
+     * Searches for players by username pattern.
+     * Responsible Team Member: CHARLES KENNETH DESEAR (Manage Players Backend)
+     * 
+     * @param request Contains search query/username pattern
+     * @param responseObserver Observer for sending list of matching players
+     */
     @Override
     public void searchPlayer(SearchQuery request, StreamObserver<PlayerList> responseObserver) {
         // TODO: Implement player search functionality
@@ -130,6 +162,13 @@ public class AdminServiceImpl extends AdminServiceGrpc.AdminServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    /**
+     * Updates game configuration settings.
+     * Responsible Team Member: CHARLES KENNETH DESEAR (Game Setting Backend)
+     * 
+     * @param request Contains new wait_time and round_duration values
+     * @param responseObserver Observer for sending update status
+     */
     @Override
     public void updateConfig(Config request, StreamObserver<Status> responseObserver) {
         try {

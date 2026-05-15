@@ -12,6 +12,11 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * Authentication Service Backend Implementation
+ * Responsible Team Member: NICOLE DEOCALES
+ * Handles user login and logout operations, session management
+ */
 public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
 
     private final UserDAO userDAO = new UserDAO();
@@ -19,6 +24,15 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
     // Tracks active sessions (username to sessionId)
     private static final ConcurrentHashMap<String, String> activeSessions = new ConcurrentHashMap<>();
 
+    /**
+     * Authenticates user credentials and creates a login session.
+     * Responsible Team Member: NICOLE DEOCALES
+     * 
+     * Validates username/password, terminates previous sessions, and returns user role
+     * 
+     * @param request Contains username and password
+     * @param responseObserver Observer for sending login response with success status and role
+     */
     @Override
     public void login(LoginRequest request, StreamObserver<LoginResponse> responseObserver) {
 
@@ -68,6 +82,13 @@ public class AuthServiceImpl extends AuthServiceGrpc.AuthServiceImplBase {
         responseObserver.onCompleted();
     }
 
+    /**
+     * Terminates a user session and clears session data.
+     * Responsible Team Member: NICOLE DEOCALES
+     * 
+     * @param request Contains username of user logging out
+     * @param responseObserver Observer for sending logout response
+     */
     @Override
     public void logout(LogoutRequest request, StreamObserver<LogoutResponse> responseObserver) {
 

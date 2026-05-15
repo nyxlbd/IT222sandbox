@@ -7,6 +7,8 @@ import com.wordy.common.config.ClientConfiguration;
 import java.util.concurrent.TimeUnit;
 
 /**
+ * gRPC Connection Manager (Admin Module Infrastructure)
+ * Responsible Team Members: KATHRINA SHAYNE RAGOS
  * Singleton class to manage gRPC channel connection to the Wordy server.
  * Provides a single connection instance used by all admin service clients.
  * Server host and port are configured via ClientConfiguration.
@@ -27,6 +29,7 @@ public class GrpcConnectionManager {
 
     /**
      * Gets the singleton instance of the connection manager.
+     * Responsible Team Member: KATHRINA SHAYNE RAGOS
      */
     public static synchronized GrpcConnectionManager getInstance() {
         if (instance == null) {
@@ -37,6 +40,7 @@ public class GrpcConnectionManager {
 
     /**
      * Gets or creates the gRPC channel connection.
+     * Responsible Team Member: KATHRINA SHAYNE RAGOS
      */
     public synchronized Channel getChannel() {
         if (channel == null || channel.isShutdown()) {

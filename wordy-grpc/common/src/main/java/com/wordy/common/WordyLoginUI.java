@@ -15,6 +15,12 @@ import com.wordy.proto.LogoutResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
+/**
+ * Login Screen UI (Shared Component)
+ * Responsible Team Member: JAN VON KRISTOFF RASALAN (UI Design)
+ * Shared login interface used by both Player and Admin applications
+ * Backend authentication handled by: NICOLE DEOCALES
+ */
 public class WordyLoginUI extends JFrame {
 
     private static final int SERVER_PORT = 50051;

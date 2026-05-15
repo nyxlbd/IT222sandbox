@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Leaderboard Service Client
+ * Responsible Team Member: JACKSON MARIANO
  * Wrapper client for gRPC LeaderboardService.
  * Handles fetching leaderboard data (top players and longest words).
  */

@@ -12,16 +12,32 @@ import com.wordy.player.model.WordRecord;
 import com.wordy.player.service.GameStateManager;
 import java.util.List;
 
+/**
+ * Leaderboard / Top Players UI
+ * Responsible Team Member: JAN VON KRISTOFF RASALAN
+ * Displays top players by wins and longest words submitted in games
+ */
 public class WordyLeaderBoard extends JFrame {
     private String currentUsername;
     private JPanel topWinsPanel;
     private JPanel longestWordsPanel;
     private LeaderboardData leaderboardData;
 
+    /**
+     * Creates a new leaderboard with no username.
+     * Responsible Team Member: JAN VON KRISTOFF RASALAN
+     */
     public WordyLeaderBoard() {
         this(null);
     }
 
+    /**
+     * Initializes and displays the leaderboard showing top players and longest words.
+     * Responsible Team Member: JAN VON KRISTOFF RASALAN
+     * Fetches leaderboard data from server and displays in two panels.
+     * 
+     * @param username the current player's username (for context, may be null)
+     */
     public WordyLeaderBoard(String username) {
         this.currentUsername = username;
         setTitle("Wordy - Leaderboard");

@@ -1,5 +1,7 @@
 package com.wordy.admin;
 
+import com.wordy.admin.service.AdminServiceClient;
+import com.wordy.admin.service.AdminServiceClient.GameSettings;
 import com.wordy.common.WordyLoginUI;
 
 import javax.swing.*;
@@ -7,12 +9,24 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * Game Settings Configuration UI
+ * Responsible Team Member: KATHRINA SHAYNE RAGOS
+ * Interface for configuring game parameters such as waiting time and round duration
+ */
 public class AdminGameSettingsUI extends JFrame {
 
     private JTextField waitingField;
     private JTextField roundField;
+    private AdminServiceClient adminServiceClient;
 
+    /**
+     * Initializes and displays the game settings configuration dialog.
+     * Responsible Team Member: KATHRINA SHAYNE RAGOS
+     * Allows admin to configure waiting time before game start and round duration.
+     */
     public AdminGameSettingsUI() {
+        this.adminServiceClient = new AdminServiceClient();
 
         setTitle("Wordy - Admin");
         setSize(1000, 700);
@@ -69,7 +83,7 @@ public class AdminGameSettingsUI extends JFrame {
         waitingLbl.setBounds(40, 80, 200, 25);
         configPanel.add(waitingLbl);
 
-        waitingField = new JTextField("10");
+        waitingField = new JTextField();
         waitingField.setBounds(240, 80, 130, 25);
         configPanel.add(waitingField);
 
@@ -77,7 +91,7 @@ public class AdminGameSettingsUI extends JFrame {
         roundLbl.setBounds(40, 130, 200, 25);
         configPanel.add(roundLbl);
 
-        roundField = new JTextField("30");
+        roundField = new JTextField();
         roundField.setBounds(240, 130, 130, 25);
         configPanel.add(roundField);
 
@@ -94,6 +108,61 @@ public class AdminGameSettingsUI extends JFrame {
         cancelBtn.addActionListener(e -> dispose());
 
         saveBtn.addActionListener(e -> saveSettings());
+
+        // Load settings from server
+        loadGameSettings();
+    }
+
+    // ================= LOAD SETTINGS LOGIC =================
+    /**
+     * Loads game settings from the server
+     * Responsible Team Member: KATHRINA SHAYNE RAGOS
+     */
+    private void loadGameSettings() {
+        SwingUtilities.invokeLater(() -> {
+            try {
+                GameSettings settings = adminServiceClient.getGameSettings();
+                waitingField.setText(String.valueOf(settings.waitingTime));
+                roundField.setText(String.valueOf(settings.roundDuration));
+            } catch (Exception e) {
+                System.err.println("Error loading settings: " + e.getMessage());
+                // Fallback to defaults
+                waitingField.setText("10");
+                roundField.setText("30");
+            }
+        });
+    }
+
+    // ================= SAVE LOGIC =================
+    /**
+     * Saves game settings to the server
+     * Responsible Team Member: KATHRINA SHAYNE RAGOS
+     */
+    private void saveSettings() {
+
+        String waiting = waitingField.getText().trim();
+        String round = roundField.getText().trim();
+
+        // VALIDATION
+        if (!waiting.matches("\\d+") || !round.matches("\\d+")) {
+            showMessage("Enter valid numbers only.");
+            return;
+        }
+
+        int waitingTime = Integer.parseInt(waiting);
+        int roundDuration = Integer.parseInt(round);
+
+        if (waitingTime <= 0 || roundDuration <= 0) {
+            showMessage("Values must be greater than 0.");
+            return;
+        }
+
+        // Call service to update settings
+        if (adminServiceClient.updateGameSettings(waitingTime, roundDuration)) {
+            showMessage("Settings saved successfully!");
+        } else {
+            showMessage("Failed to save settings.");
+        }
     }
 
     // ================= BUTTON STYLES =================
@@ -114,40 +183,6 @@ public class AdminGameSettingsUI extends JFrame {
         button.setCursor(new Cursor(Cursor.HAND_CURSOR));
         button.setFont(new Font("Arial", Font.PLAIN, 13));
         button.setOpaque(true);
-    }
-
-    // ================= SAVE LOGIC =================
-    private void saveSettings() {
-
-        String waiting = waitingField.getText().trim();
-        String round = roundField.getText().trim();
-
-        // VALIDATION
-        if (!waiting.matches("\\d+") || !round.matches("\\d+")) {
-            showMessage("Enter valid numbers only.");
-            return;
-        }
-
-        int waitingTime = Integer.parseInt(waiting);
-        int roundDuration = Integer.parseInt(round);
-
-        if (waitingTime <= 0 || roundDuration <= 0) {
-            showMessage("Values must be greater than 0.");
-            return;
-        }
-
-        // ================= BACKEND PLACEHOLDER =================
-        /*
-        GameConfigRequest request = GameConfigRequest.newBuilder()
-                .setWaitingTime(waitingTime)
-                .setRoundDuration(roundDuration)
-                .build();
-
-        adminStub.updateGameConfig(request);
-        */
-        // ======================================================
-
-        showMessage("Settings saved successfully!");
     }
 
     // ================= CUSTOM DIALOG =================
