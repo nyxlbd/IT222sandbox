@@ -218,6 +218,21 @@ private static final long serialVersionUID = 0L;
     return roundNumber_;
   }
 
+  public static final int ROUNDDURATION_FIELD_NUMBER = 6;
+  private int roundDuration_ = 0;
+  /**
+   * <pre>
+   * seconds - duration for this round
+   * </pre>
+   *
+   * <code>int32 roundDuration = 6;</code>
+   * @return The roundDuration.
+   */
+  @java.lang.Override
+  public int getRoundDuration() {
+    return roundDuration_;
+  }
+
   private byte memoizedIsInitialized = -1;
   @java.lang.Override
   public final boolean isInitialized() {
@@ -247,6 +262,9 @@ private static final long serialVersionUID = 0L;
     if (roundNumber_ != 0) {
       output.writeInt32(5, roundNumber_);
     }
+    if (roundDuration_ != 0) {
+      output.writeInt32(6, roundDuration_);
+    }
     getUnknownFields().writeTo(output);
   }
 
@@ -271,6 +289,10 @@ private static final long serialVersionUID = 0L;
     if (roundNumber_ != 0) {
       size += com.google.protobuf.CodedOutputStream
         .computeInt32Size(5, roundNumber_);
+    }
+    if (roundDuration_ != 0) {
+      size += com.google.protobuf.CodedOutputStream
+        .computeInt32Size(6, roundDuration_);
     }
     size += getUnknownFields().getSerializedSize();
     memoizedSize = size;
@@ -297,6 +319,8 @@ private static final long serialVersionUID = 0L;
         .equals(other.getWinner())) return false;
     if (getRoundNumber()
         != other.getRoundNumber()) return false;
+    if (getRoundDuration()
+        != other.getRoundDuration()) return false;
     if (!getUnknownFields().equals(other.getUnknownFields())) return false;
     return true;
   }
@@ -318,6 +342,8 @@ private static final long serialVersionUID = 0L;
     hash = (53 * hash) + getWinner().hashCode();
     hash = (37 * hash) + ROUNDNUMBER_FIELD_NUMBER;
     hash = (53 * hash) + getRoundNumber();
+    hash = (37 * hash) + ROUNDDURATION_FIELD_NUMBER;
+    hash = (53 * hash) + getRoundDuration();
     hash = (29 * hash) + getUnknownFields().hashCode();
     memoizedHashCode = hash;
     return hash;
@@ -454,6 +480,7 @@ private static final long serialVersionUID = 0L;
       letters_ = "";
       winner_ = "";
       roundNumber_ = 0;
+      roundDuration_ = 0;
       return this;
     }
 
@@ -501,6 +528,9 @@ private static final long serialVersionUID = 0L;
       }
       if (((from_bitField0_ & 0x00000010) != 0)) {
         result.roundNumber_ = roundNumber_;
+      }
+      if (((from_bitField0_ & 0x00000020) != 0)) {
+        result.roundDuration_ = roundDuration_;
       }
     }
 
@@ -571,6 +601,9 @@ private static final long serialVersionUID = 0L;
       if (other.getRoundNumber() != 0) {
         setRoundNumber(other.getRoundNumber());
       }
+      if (other.getRoundDuration() != 0) {
+        setRoundDuration(other.getRoundDuration());
+      }
       this.mergeUnknownFields(other.getUnknownFields());
       onChanged();
       return this;
@@ -622,6 +655,11 @@ private static final long serialVersionUID = 0L;
               bitField0_ |= 0x00000010;
               break;
             } // case 40
+            case 48: {
+              roundDuration_ = input.readInt32();
+              bitField0_ |= 0x00000020;
+              break;
+            } // case 48
             default: {
               if (!super.parseUnknownField(input, extensionRegistry, tag)) {
                 done = true; // was an endgroup tag
@@ -975,6 +1013,50 @@ private static final long serialVersionUID = 0L;
     public Builder clearRoundNumber() {
       bitField0_ = (bitField0_ & ~0x00000010);
       roundNumber_ = 0;
+      onChanged();
+      return this;
+    }
+
+    private int roundDuration_ ;
+    /**
+     * <pre>
+     * seconds - duration for this round
+     * </pre>
+     *
+     * <code>int32 roundDuration = 6;</code>
+     * @return The roundDuration.
+     */
+    @java.lang.Override
+    public int getRoundDuration() {
+      return roundDuration_;
+    }
+    /**
+     * <pre>
+     * seconds - duration for this round
+     * </pre>
+     *
+     * <code>int32 roundDuration = 6;</code>
+     * @param value The roundDuration to set.
+     * @return This builder for chaining.
+     */
+    public Builder setRoundDuration(int value) {
+
+      roundDuration_ = value;
+      bitField0_ |= 0x00000020;
+      onChanged();
+      return this;
+    }
+    /**
+     * <pre>
+     * seconds - duration for this round
+     * </pre>
+     *
+     * <code>int32 roundDuration = 6;</code>
+     * @return This builder for chaining.
+     */
+    public Builder clearRoundDuration() {
+      bitField0_ = (bitField0_ & ~0x00000020);
+      roundDuration_ = 0;
       onChanged();
       return this;
     }

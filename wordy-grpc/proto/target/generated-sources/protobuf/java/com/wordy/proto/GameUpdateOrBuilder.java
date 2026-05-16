@@ -69,4 +69,14 @@ public interface GameUpdateOrBuilder extends
    * @return The roundNumber.
    */
   int getRoundNumber();
+
+  /**
+   * <pre>
+   * seconds - duration for this round
+   * </pre>
+   *
+   * <code>int32 roundDuration = 6;</code>
+   * @return The roundDuration.
+   */
+  int getRoundDuration();
 }

@@ -185,9 +185,10 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
             if (session.hasGameStarted()) {
                 responseObserver.onNext(GameUpdate.newBuilder()
                         .setType("START")
-                        .setMessage("Game is starting! You have 30 seconds per round.")
+                        .setMessage("Game is starting! You have " + (session.getRoundDuration() / 1000) + " seconds per round.")
                         .setLetters(session.getCurrentLetters())
                         .setRoundNumber(session.getCurrentRound())
+                        .setRoundDuration((int)(session.getRoundDuration() / 1000))
                         .build());
             } else {
                 // Send initial WAITING update
@@ -220,9 +221,10 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
             
             broadcastGameUpdate(gameId, GameUpdate.newBuilder()
                     .setType("START")
-                    .setMessage("Game is starting! You have 30 seconds per round.")
+                    .setMessage("Game is starting! You have " + (session.getRoundDuration() / 1000) + " seconds per round.")
                     .setLetters(letters)
                     .setRoundNumber(session.getCurrentRound())
+                    .setRoundDuration((int)(session.getRoundDuration() / 1000))
                     .build());
             
             // Start the game loop in a new thread
@@ -251,6 +253,7 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
                         .setMessage("Round " + session.getCurrentRound() + " started!")
                         .setLetters(letters)
                         .setRoundNumber(session.getCurrentRound())
+                        .setRoundDuration((int)(session.getRoundDuration() / 1000))
                         .build());
 
                 // Wait for round duration

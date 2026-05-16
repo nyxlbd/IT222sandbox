@@ -78,6 +78,8 @@ message GameUpdate {
   string winner = 4;
 
   int32 roundNumber = 5;
+
+  int32 roundDuration = 6; // seconds - duration for this round
 }
 
 service GameService {

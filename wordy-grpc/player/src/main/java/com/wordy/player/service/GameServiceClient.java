@@ -103,6 +103,7 @@ public class GameServiceClient {
                             protoUpdate.getWinner(),
                             protoUpdate.getRoundNumber()
                     );
+                    modelUpdate.setRoundDuration(protoUpdate.getRoundDuration());
                     updateCallback.onNext(modelUpdate);
                 }
 

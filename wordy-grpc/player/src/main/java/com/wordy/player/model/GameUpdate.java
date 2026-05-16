@@ -10,6 +10,7 @@ public class GameUpdate {
     private String letters;
     private String winner;
     private int roundNumber;
+    private int roundDuration;
 
     public GameUpdate(String type, String message, String letters, String winner, int roundNumber) {
         this.type = type;
@@ -17,6 +18,7 @@ public class GameUpdate {
         this.letters = letters;
         this.winner = winner;
         this.roundNumber = roundNumber;
+        this.roundDuration = 0;
     }
 
     public String getType() {
@@ -59,6 +61,14 @@ public class GameUpdate {
         this.roundNumber = roundNumber;
     }
 
+    public int getRoundDuration() {
+        return roundDuration;
+    }
+
+    public void setRoundDuration(int roundDuration) {
+        this.roundDuration = roundDuration;
+    }
+
     @Override
     public String toString() {
         return "GameUpdate{" +
@@ -67,6 +77,7 @@ public class GameUpdate {
                 ", letters='" + letters + '\'' +
                 ", winner='" + winner + '\'' +
                 ", roundNumber=" + roundNumber +
+                ", roundDuration=" + roundDuration +
                 '}';
     }
 }

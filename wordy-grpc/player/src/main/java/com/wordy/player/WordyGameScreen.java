@@ -26,6 +26,7 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
     private JPanel lettersPanel;
     private List<String> submissions;
     private int timeRemaining = 30;
+    private int roundDuration = 30; // Duration from server in seconds
     private int currentRound;
     private Timer gameTimer;
     private GameStateManager gameManager;
@@ -335,8 +336,10 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
                     }
                     if (update.getLetters() != null && !update.getLetters().isEmpty()) {
                         displayLetters(update.getLetters());
-                        timeRemaining = 30;
-                        timerLabel.setText("30s");
+                        // Use round duration from server
+                        roundDuration = update.getRoundDuration() > 0 ? update.getRoundDuration() : 30;
+                        timeRemaining = roundDuration;
+                        timerLabel.setText(timeRemaining + "s");
                         startTimer();
                     }
                     break;
@@ -350,11 +353,13 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
                     }
                     if (update.getLetters() != null && !update.getLetters().isEmpty()) {
                         displayLetters(update.getLetters());
-                        timeRemaining = 30;
-                        timerLabel.setText("30s");
-                        if (gameTimer != null && !gameTimer.isRunning()) {
-                            startTimer();
-                        }
+                        // Use round duration from server
+                        roundDuration = update.getRoundDuration() > 0 ? update.getRoundDuration() : 30;
+                        timeRemaining = roundDuration;
+                        timerLabel.setText(timeRemaining + "s");
+                        // Stop existing timer and start a new one
+                        stopTimer();
+                        startTimer();
                     }
                     break;
 

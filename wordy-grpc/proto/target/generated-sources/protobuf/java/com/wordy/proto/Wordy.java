@@ -136,39 +136,39 @@ public final class Wordy {
       "uccess\030\001 \001(\010\022\017\n\007message\030\002 \001(\t\"\037\n\013GameReq" +
       "uest\022\020\n\010username\030\001 \001(\t\"-\n\013WordRequest\022\020\n" +
       "\010username\030\001 \001(\t\022\014\n\004word\030\002 \001(\t\".\n\014WordRes" +
-      "ponse\022\r\n\005valid\030\001 \001(\010\022\017\n\007message\030\002 \001(\t\"a\n" +
+      "ponse\022\r\n\005valid\030\001 \001(\010\022\017\n\007message\030\002 \001(\t\"x\n" +
       "\nGameUpdate\022\014\n\004type\030\001 \001(\t\022\017\n\007message\030\002 \001" +
       "(\t\022\017\n\007letters\030\003 \001(\t\022\016\n\006winner\030\004 \001(\t\022\023\n\013r" +
-      "oundNumber\030\005 \001(\005\"-\n\013PlayerStats\022\020\n\010usern" +
-      "ame\030\001 \001(\t\022\014\n\004wins\030\002 \001(\005\"<\n\nWordRecord\022\020\n" +
-      "\010username\030\001 \001(\t\022\014\n\004word\030\002 \001(\t\022\016\n\006length\030" +
-      "\003 \001(\005\"f\n\023LeaderboardResponse\022&\n\ntopPlaye" +
-      "rs\030\001 \003(\0132\022.wordy.PlayerStats\022\'\n\014longestW" +
-      "ords\030\002 \003(\0132\021.wordy.WordRecord\"F\n\006Player\022" +
-      "\n\n\002id\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\020\n\010passwor" +
-      "d\030\003 \001(\t\022\014\n\004wins\030\004 \001(\005\"\026\n\010PlayerId\022\n\n\002id\030" +
-      "\001 \001(\005\"\036\n\013SearchQuery\022\017\n\007keyword\030\001 \001(\t\",\n" +
-      "\nPlayerList\022\036\n\007players\030\001 \003(\0132\r.wordy.Pla" +
-      "yer\"1\n\006Config\022\020\n\010waitTime\030\001 \001(\005\022\025\n\rround" +
-      "Duration\030\002 \001(\0052x\n\013AuthService\0222\n\005Login\022\023" +
-      ".wordy.LoginRequest\032\024.wordy.LoginRespons" +
-      "e\0225\n\006Logout\022\024.wordy.LogoutRequest\032\025.word" +
-      "y.LogoutResponse2\270\001\n\013GameService\022;\n\010Join" +
-      "Game\022\026.wordy.JoinGameRequest\032\027.wordy.Joi" +
-      "nGameResponse\0225\n\nSubmitWord\022\022.wordy.Word" +
-      "Request\032\023.wordy.WordResponse\0225\n\nStreamGa" +
-      "me\022\022.wordy.GameRequest\032\021.wordy.GameUpdat" +
-      "e0\0012P\n\022LeaderboardService\022:\n\016GetLeaderbo" +
-      "ard\022\014.wordy.Empty\032\032.wordy.LeaderboardRes" +
-      "ponse2\251\002\n\014AdminService\022,\n\014CreatePlayer\022\r" +
-      ".wordy.Player\032\r.wordy.Status\022,\n\014UpdatePl" +
-      "ayer\022\r.wordy.Player\032\r.wordy.Status\022.\n\014De" +
-      "letePlayer\022\017.wordy.PlayerId\032\r.wordy.Stat" +
-      "us\0225\n\014SearchPlayer\022\022.wordy.SearchQuery\032\021" +
-      ".wordy.PlayerList\022,\n\014UpdateConfig\022\r.word" +
-      "y.Config\032\r.wordy.Status\022(\n\tGetConfig\022\014.w" +
-      "ordy.Empty\032\r.wordy.ConfigB\023\n\017com.wordy.p" +
-      "rotoP\001b\006proto3"
+      "oundNumber\030\005 \001(\005\022\025\n\rroundDuration\030\006 \001(\005\"" +
+      "-\n\013PlayerStats\022\020\n\010username\030\001 \001(\t\022\014\n\004wins" +
+      "\030\002 \001(\005\"<\n\nWordRecord\022\020\n\010username\030\001 \001(\t\022\014" +
+      "\n\004word\030\002 \001(\t\022\016\n\006length\030\003 \001(\005\"f\n\023Leaderbo" +
+      "ardResponse\022&\n\ntopPlayers\030\001 \003(\0132\022.wordy." +
+      "PlayerStats\022\'\n\014longestWords\030\002 \003(\0132\021.word" +
+      "y.WordRecord\"F\n\006Player\022\n\n\002id\030\001 \001(\005\022\020\n\010us" +
+      "ername\030\002 \001(\t\022\020\n\010password\030\003 \001(\t\022\014\n\004wins\030\004" +
+      " \001(\005\"\026\n\010PlayerId\022\n\n\002id\030\001 \001(\005\"\036\n\013SearchQu" +
+      "ery\022\017\n\007keyword\030\001 \001(\t\",\n\nPlayerList\022\036\n\007pl" +
+      "ayers\030\001 \003(\0132\r.wordy.Player\"1\n\006Config\022\020\n\010" +
+      "waitTime\030\001 \001(\005\022\025\n\rroundDuration\030\002 \001(\0052x\n" +
+      "\013AuthService\0222\n\005Login\022\023.wordy.LoginReque" +
+      "st\032\024.wordy.LoginResponse\0225\n\006Logout\022\024.wor" +
+      "dy.LogoutRequest\032\025.wordy.LogoutResponse2" +
+      "\270\001\n\013GameService\022;\n\010JoinGame\022\026.wordy.Join" +
+      "GameRequest\032\027.wordy.JoinGameResponse\0225\n\n" +
+      "SubmitWord\022\022.wordy.WordRequest\032\023.wordy.W" +
+      "ordResponse\0225\n\nStreamGame\022\022.wordy.GameRe" +
+      "quest\032\021.wordy.GameUpdate0\0012P\n\022Leaderboar" +
+      "dService\022:\n\016GetLeaderboard\022\014.wordy.Empty" +
+      "\032\032.wordy.LeaderboardResponse2\251\002\n\014AdminSe" +
+      "rvice\022,\n\014CreatePlayer\022\r.wordy.Player\032\r.w" +
+      "ordy.Status\022,\n\014UpdatePlayer\022\r.wordy.Play" +
+      "er\032\r.wordy.Status\022.\n\014DeletePlayer\022\017.word" +
+      "y.PlayerId\032\r.wordy.Status\0225\n\014SearchPlaye" +
+      "r\022\022.wordy.SearchQuery\032\021.wordy.PlayerList" +
+      "\022,\n\014UpdateConfig\022\r.wordy.Config\032\r.wordy." +
+      "Status\022(\n\tGetConfig\022\014.wordy.Empty\032\r.word" +
+      "y.ConfigB\023\n\017com.wordy.protoP\001b\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -245,7 +245,7 @@ public final class Wordy {
     internal_static_wordy_GameUpdate_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_wordy_GameUpdate_descriptor,
-        new java.lang.String[] { "Type", "Message", "Letters", "Winner", "RoundNumber", });
+        new java.lang.String[] { "Type", "Message", "Letters", "Winner", "RoundNumber", "RoundDuration", });
     internal_static_wordy_PlayerStats_descriptor =
       getDescriptor().getMessageTypes().get(12);
     internal_static_wordy_PlayerStats_fieldAccessorTable = new
