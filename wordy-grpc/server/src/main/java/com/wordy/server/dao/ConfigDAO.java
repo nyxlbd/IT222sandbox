@@ -5,6 +5,7 @@ import com.wordy.server.db.DBConnection;
 import java.sql.*;
 
 /**
+ * Team Member: Charles
  * Data Access Object for game configuration.
  * Manages system-wide settings like wait_time and round_duration.
  */

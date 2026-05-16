@@ -5,6 +5,7 @@ import com.wordy.server.db.DBConnection;
 import java.sql.*;
 
 /**
+ * Team Member: Adelyn Joy Tela
  * Data Access Object for game results.
  * Manages recording of completed games.
  */
