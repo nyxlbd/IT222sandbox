@@ -220,6 +220,7 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
     private void displayLetters(String letters) {
         SwingUtilities.invokeLater(() -> {
             lettersPanel.removeAll();
+            lettersPanel.setLayout(null); // Set to null for absolute positioning
             
             // Letters Title
             JLabel lettersTitle = new JLabel("Available Letters (" + letters.length() + ")");
