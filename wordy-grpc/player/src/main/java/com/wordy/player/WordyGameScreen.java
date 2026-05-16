@@ -326,21 +326,29 @@ public class WordyGameScreen extends JFrame implements GameStateManager.GameUpda
     @Override
     public void onGameUpdate(GameUpdate update) {
         SwingUtilities.invokeLater(() -> {
+            System.out.println("DEBUG: Received update - Type: " + update.getType() + ", Letters: " + update.getLetters() + ", RoundNum: " + update.getRoundNumber());
+            
             switch (update.getType().toUpperCase()) {
                 case "START":
                     // Game started - display first round with letters and start timer
+                    System.out.println("DEBUG: START case - letters null? " + (update.getLetters() == null) + ", isEmpty? " + (update.getLetters() != null && update.getLetters().isEmpty()));
                     if (update.getRoundNumber() > 0) {
                         currentRound = update.getRoundNumber();
                         roundTitle.setText("Round " + currentRound);
                         roundLabel.setText("Round " + currentRound + " (You: " + playerWins + " | Opponent: " + opponentWins + ")");
                     }
-                    if (update.getLetters() != null && !update.getLetters().isEmpty()) {
-                        displayLetters(update.getLetters());
+                    // Display letters if provided (even if empty string, still process)
+                    String startLetters = update.getLetters();
+                    if (startLetters != null && startLetters.length() > 0) {
+                        System.out.println("DEBUG: Displaying letters in START: " + startLetters);
+                        displayLetters(startLetters);
                         // Use round duration from server
                         roundDuration = update.getRoundDuration() > 0 ? update.getRoundDuration() : 30;
                         timeRemaining = roundDuration;
                         timerLabel.setText(timeRemaining + "s");
                         startTimer();
+                    } else {
+                        System.out.println("DEBUG: START has no letters, waiting for ROUND update");
                     }
                     break;
 

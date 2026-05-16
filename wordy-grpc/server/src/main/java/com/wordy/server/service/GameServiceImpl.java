@@ -183,15 +183,18 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
 
             // If game has already started, send the START update to this player
             if (session.hasGameStarted()) {
+                String currentLetters = session.getCurrentLetters();
+                System.out.println("DEBUG: streamGame - game started, sending START with letters: " + currentLetters);
                 responseObserver.onNext(GameUpdate.newBuilder()
                         .setType("START")
                         .setMessage("Game is starting! You have " + (session.getRoundDuration() / 1000) + " seconds per round.")
-                        .setLetters(session.getCurrentLetters())
+                        .setLetters(currentLetters)
                         .setRoundNumber(session.getCurrentRound())
                         .setRoundDuration((int)(session.getRoundDuration() / 1000))
                         .build());
             } else {
                 // Send initial WAITING update
+                System.out.println("DEBUG: streamGame - game not started, sending WAITING");
                 responseObserver.onNext(GameUpdate.newBuilder()
                         .setType("WAITING")
                         .setMessage("Waiting for another player to join...")
@@ -218,6 +221,8 @@ public class GameServiceImpl extends GameServiceGrpc.GameServiceImplBase {
             String letters = LetterGenerator.generateLetters();
             session.setCurrentLetters(letters);
             session.markGameStarted(); // Mark that game has started
+            
+            System.out.println("DEBUG: Starting game " + gameId + " with letters: " + letters);
             
             broadcastGameUpdate(gameId, GameUpdate.newBuilder()
                     .setType("START")
